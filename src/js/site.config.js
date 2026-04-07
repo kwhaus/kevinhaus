@@ -18,7 +18,7 @@ const config = {
   defaultTheme: 'light',
 
   // Admin page password (simple client-side protection — not for sensitive data)
-  adminPassword: 'zukqaj-8behmi-kYsnyd',
+  adminPassword: import.meta.env.VITE_ADMIN_PASSWORD || 'changeme',
 
 }
 
