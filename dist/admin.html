@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kevin Haus — Admin</title>
+  <!-- No index by search engines -->
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://kevinhaus.com/assets/favicon-32x32.png">
+  <script type="module" crossorigin src="/assets/admin-BoFe2Q6M.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/rolldown-runtime-BsEtRdTP.js">
+  <link rel="modulepreload" crossorigin href="/assets/bootstrap-Cbo2cs6e.js">
+  <link rel="modulepreload" crossorigin href="/assets/nav-DImyApw8.js">
+  <link rel="modulepreload" crossorigin href="/assets/videos-Bjk9PVz8.js">
+  <link rel="stylesheet" crossorigin href="/assets/nav-C_tusQbI.css">
+</head>
+<body>
+
+  <!-- Nav injected by JS -->
+  <div id="kh-nav-mount"></div>
+
+  <main class="kh-page">
+    <div class="kh-admin">
+
+      <!-- Login screen -->
+      <div id="adminLogin" class="kh-admin-login">
+        <h1 style="font-size:1.5rem; margin-bottom:2rem; letter-spacing:0.1em;">Admin</h1>
+        <input
+          type="password"
+          id="adminPw"
+          class="form-control mb-3"
+          placeholder="Password"
+          style="background:var(--kh-bg-secondary); border-color:var(--kh-border); color:var(--kh-text);"
+        >
+        <button id="adminLoginBtn" class="btn btn-outline-secondary w-100" style="font-family:inherit; letter-spacing:0.08em;">
+          Enter
+        </button>
+        <p id="adminLoginErr" style="color:var(--kh-accent); font-size:0.8rem; margin-top:0.75rem; display:none;">
+          Incorrect password.
+        </p>
+      </div>
+
+      <!-- Admin panel (hidden until logged in) -->
+      <div id="adminPanel" style="display:none;">
+
+        <div class="kh-admin-header">
+          <span>Video List — drag to reorder</span>
+          <span style="font-size:0.7rem; color:var(--kh-text-muted);">Changes download as videos.json — replace the file in src/ then rebuild</span>
+        </div>
+
+        <!-- Video list -->
+        <div id="adminList">
+          <!-- Cards injected by admin.js -->
+        </div>
+
+        <!-- Add video form -->
+        <div style="margin-top: 2rem; border-top: 1px solid var(--kh-border); padding-top: 1.5rem;">
+          <h2 style="font-size:0.8rem; letter-spacing:0.15em; text-transform:uppercase; margin-bottom:1.25rem; color:var(--kh-text-muted);">Add New Video</h2>
+          <div class="row g-2">
+            <div class="col-12 col-md-6">
+              <input type="text" id="newTitle" class="form-control form-control-sm" placeholder="Title (e.g. Nothing - Purple Strings)"
+                style="background:var(--kh-bg-secondary); border-color:var(--kh-border); color:var(--kh-text); font-family:inherit;">
+            </div>
+            <div class="col-12 col-md-3">
+              <select id="newType" class="form-select form-select-sm"
+                style="background:var(--kh-bg-secondary); border-color:var(--kh-border); color:var(--kh-text); font-family:inherit;">
+                <option value="music video">Music Video</option>
+                <option value="commercial">Commercial</option>
+                <option value="branded content">Branded Content</option>
+                <option value="short film">Short Film</option>
+              </select>
+            </div>
+            <div class="col-12 col-md-3">
+              <input type="text" id="newAspect" class="form-control form-control-sm" placeholder="Aspect ratio (16:9)"
+                style="background:var(--kh-bg-secondary); border-color:var(--kh-border); color:var(--kh-text); font-family:inherit;">
+            </div>
+            <div class="col-12 col-md-6">
+              <input type="text" id="newAssetId" class="form-control form-control-sm" placeholder="Mux Asset ID"
+                style="background:var(--kh-bg-secondary); border-color:var(--kh-border); color:var(--kh-text); font-family:inherit;">
+            </div>
+            <div class="col-12 col-md-6">
+              <input type="text" id="newPlaybackId" class="form-control form-control-sm" placeholder="Mux Playback ID"
+                style="background:var(--kh-bg-secondary); border-color:var(--kh-border); color:var(--kh-text); font-family:inherit;">
+            </div>
+            <div class="col-12">
+              <input type="text" id="newStills" class="form-control form-control-sm" placeholder="Still filenames, comma-separated (e.g. newvid01.jpg, newvid02.jpg)"
+                style="background:var(--kh-bg-secondary); border-color:var(--kh-border); color:var(--kh-text); font-family:inherit;">
+            </div>
+            <div class="col-12">
+              <button id="addVideoBtn" class="btn btn-sm btn-outline-secondary" style="font-family:inherit; letter-spacing:0.06em;">
+                + Add to List
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Download button -->
+        <div style="margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid var(--kh-border); display:flex; gap:1rem; align-items:center;">
+          <button id="downloadJson" class="btn btn-outline-secondary" style="font-family:inherit; letter-spacing:0.08em;">
+            ↓ Download videos.json
+          </button>
+          <span style="font-size:0.75rem; color:var(--kh-text-muted);">
+            Save to <code>src/videos.json</code>, then run <code>npm run build</code>
+          </span>
+        </div>
+
+      </div>
+    </div>
+
+    <footer class="kh-footer">
+      <div class="kh-footer-logo">
+        <img
+          src="https://kevinhaus.com/assets/KH_Square.png"
+          data-logo-light="https://kevinhaus.com/assets/KH_Square.png"
+          data-logo-dark="https://kevinhaus.com/assets/KH_Square_wht.png"
+          data-logo-swap
+          alt="KH"
+        >
+      </div>
+    </footer>
+  </main>
+
+</body>
+</html>

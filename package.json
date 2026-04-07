@@ -1,0 +1,19 @@
+{
+  "name": "kevinhaus",
+  "version": "1.0.0",
+  "description": "kevinhaus.com — director portfolio",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "sass": "^1.77.0",
+    "vite": "^8.0.3"
+  },
+  "dependencies": {
+    "@popperjs/core": "^2.11.8",
+    "bootstrap": "^5.3.3"
+  }
+}

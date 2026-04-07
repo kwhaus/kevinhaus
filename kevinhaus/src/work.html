@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kevin Haus — Work</title>
+  <link rel="canonical" href="https://kevinhaus.com/work.html">
+  <meta name="description" content="Work by Kevin Haus — music videos, commercials, branded content and short films.">
+  <meta property="og:title" content="Kevin Haus | Work">
+  <meta property="og:image" content="https://test.kevinhaus.com/assets/OG_image_work.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://test.kevinhaus.com/assets/favicon-32x32.png">
+  <link rel="apple-touch-icon" href="https://test.kevinhaus.com/assets/apple-touch-icon.png">
+  <script src="https://cdn.jsdelivr.net/npm/@mux/mux-player" defer></script>
+  <script type="module" src="./js/main.js"></script>
+  <script type="module" src="./js/work.js"></script>
+</head>
+<body>
+
+  <!-- Nav injected by JS -->
+  <div id="kh-nav-mount"></div>
+
+  <main class="kh-page">
+    <div class="kh-work">
+
+      <!-- Video player -->
+      <div class="kh-player-wrap" id="playerWrap" data-ratio="16:9">
+        <mux-player
+          id="mainPlayer"
+          playback-id=""
+          metadata-video-title=""
+          playsinline
+          style="width:100%; display:block;"
+        ></mux-player>
+      </div>
+
+      <!-- Numbered playlist -->
+      <ol class="kh-playlist" id="playlist">
+        <!-- Items injected by work.js -->
+      </ol>
+
+    </div>
+
+    <!-- Footer -->
+    <footer class="kh-footer">
+      <div class="kh-footer-logo">
+        <img src="https://test.kevinhaus.com/assets/KH_square.svg" alt="KH">
+      </div>
+      <a href="mailto:hello@kevinhaus.com" class="kh-footer-email">hello@kevinhaus.com</a>
+    </footer>
+  </main>
+
+</body>
+</html>

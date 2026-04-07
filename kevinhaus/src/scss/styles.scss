@@ -1,0 +1,729 @@
+// ── ALBERTUS FONT ─────────────────────────────────────────────────────────────
+// Font file is served from the assets folder on the server.
+// If the path changes, update the src URL below only.
+@font-face {
+  font-family: 'Albertus';
+  src: url('https://test.kevinhaus.com/assets/AlbertusMT.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+// ── BOOTSTRAP VARIABLE OVERRIDES ──────────────────────────────────────────────
+// These must come BEFORE importing Bootstrap.
+$font-family-base: 'Albertus', 'Palatino Linotype', 'Book Antiqua', Palatino, serif;
+$headings-font-family: 'Albertus', 'Palatino Linotype', 'Book Antiqua', Palatino, serif;
+$enable-transitions: true;
+$transition-base: all 0.2s ease-in-out;
+
+// ── BOOTSTRAP IMPORT ──────────────────────────────────────────────────────────
+@import '~bootstrap/scss/bootstrap';
+
+// ── COLOR TOKENS ──────────────────────────────────────────────────────────────
+// All color decisions live here. Light mode is the default.
+// Dark mode is applied via [data-bs-theme="dark"] on <html>.
+
+:root,
+[data-bs-theme="light"] {
+  --kh-bg:           #ffffff;
+  --kh-bg-secondary: #f5f5f5;
+  --kh-text:         #0a0a0a;
+  --kh-text-muted:   #666666;
+  --kh-border:       #e0e0e0;
+  --kh-accent:       #fe0000;
+  --kh-nav-bg:       rgba(255, 255, 255, 0.96);
+  --kh-overlay-bg:   rgba(245, 245, 245, 0.92);
+  --kh-shadow:       2px 3px 6px rgba(0, 0, 0, 0.25);
+
+  // Logo swap: use black logo on light bg
+  --kh-logo-filter: none;
+}
+
+[data-bs-theme="dark"] {
+  --kh-bg:           #0a0a0a;
+  --kh-bg-secondary: #111111;
+  --kh-text:         #f0f0f0;
+  --kh-text-muted:   #888888;
+  --kh-border:       #2a2a2a;
+  --kh-accent:       #fe0000;
+  --kh-nav-bg:       rgba(10, 10, 10, 0.96);
+  --kh-overlay-bg:   rgba(20, 20, 20, 0.92);
+  --kh-shadow:       2px 3px 6px rgba(0, 0, 0, 0.6);
+}
+
+// ── BASE ──────────────────────────────────────────────────────────────────────
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--kh-bg);
+  color: var(--kh-text);
+  font-family: 'Albertus', 'Palatino Linotype', 'Book Antiqua', Palatino, serif;
+  font-size: 1rem;
+  line-height: 1.6;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  min-height: 100vh;
+}
+
+// ── NAVBAR ────────────────────────────────────────────────────────────────────
+.kh-navbar {
+  background-color: var(--kh-nav-bg);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--kh-border);
+  padding: 0.75rem 1.25rem;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1030;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: background-color 0.3s ease;
+}
+
+.kh-nav-logo {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+
+  img {
+    height: 48px;
+    width: auto;
+    display: block;
+  }
+}
+
+.kh-nav-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+// Theme toggle button
+.kh-theme-toggle {
+  background: none;
+  border: 1px solid var(--kh-border);
+  color: var(--kh-text);
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+  padding: 0;
+  font-size: 14px;
+
+  &:hover {
+    border-color: var(--kh-text-muted);
+    color: var(--kh-accent);
+  }
+
+  .icon-sun { display: none; }
+  .icon-moon { display: block; }
+}
+
+[data-bs-theme="dark"] .kh-theme-toggle {
+  .icon-sun { display: block; }
+  .icon-moon { display: none; }
+}
+
+// Hamburger button
+// ── To swap to a custom icon: replace the SVG inside .kh-hamburger-icon ──
+.kh-hamburger {
+  background: none;
+  border: none;
+  color: var(--kh-text);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+
+  &:hover {
+    color: var(--kh-accent);
+  }
+}
+
+// ── OFFCANVAS NAV ─────────────────────────────────────────────────────────────
+.kh-offcanvas {
+  background-color: var(--kh-overlay-bg);
+  backdrop-filter: blur(12px);
+  border-left: 1px solid var(--kh-border);
+  width: min(360px, 85vw) !important;
+
+  .offcanvas-header {
+    border-bottom: 1px solid var(--kh-border);
+    padding: 1.25rem 1.5rem;
+  }
+
+  .offcanvas-body {
+    padding: 2rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+}
+
+.kh-offcanvas-logo {
+  img { height: 56px; width: auto; }
+}
+
+.kh-nav-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  margin-top: 1.5rem;
+
+  li {
+    border-bottom: 1px solid var(--kh-border);
+  }
+}
+
+.kh-nav-link {
+  display: block;
+  font-family: 'Albertus', serif;
+  font-size: 2rem;
+  color: var(--kh-text);
+  text-decoration: none;
+  padding: 0.75rem 0;
+  letter-spacing: 0.03em;
+  transition: color 0.15s;
+
+  &:hover,
+  &.active {
+    color: var(--kh-accent);
+  }
+}
+
+.kh-offcanvas-footer {
+  margin-top: auto;
+  padding-top: 2rem;
+  font-size: 0.8rem;
+  color: var(--kh-text-muted);
+}
+
+// ── PAGE WRAPPER ──────────────────────────────────────────────────────────────
+.kh-page {
+  padding-top: 73px; // height of fixed navbar
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+// ── FOOTER ────────────────────────────────────────────────────────────────────
+.kh-footer {
+  margin-top: auto;
+  padding: 2rem 1.25rem 1.5rem;
+  border-top: 1px solid var(--kh-border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+
+  .kh-footer-logo img {
+    height: 36px;
+    width: auto;
+    opacity: 0.6;
+  }
+
+  .kh-footer-email {
+    font-size: 0.8rem;
+    color: var(--kh-text-muted);
+    text-decoration: none;
+    letter-spacing: 0.04em;
+
+    &:hover { color: var(--kh-accent); }
+  }
+}
+
+// ── HOME PAGE ─────────────────────────────────────────────────────────────────
+.kh-home {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0;
+}
+
+.kh-home-logo {
+  width: 100%;
+  max-width: 680px;
+  padding: 2rem 1.25rem 1.5rem;
+  text-align: center;
+
+  img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+}
+
+// Still image cycler
+.kh-still-wrap {
+  width: 100%;
+  max-width: 680px;
+  padding: 0 1.25rem;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+
+  // Aspect ratio maintained by padding trick if needed,
+  // but we use object-fit so natural image dimensions control.
+}
+
+.kh-still {
+  display: block;
+  width: 100%;
+  height: auto;
+  opacity: 1;
+  transition: opacity var(--kh-fade-duration, 600ms) ease;
+
+  &.fading {
+    opacity: 0;
+  }
+}
+
+.kh-still-hint {
+  font-size: 0.7rem;
+  color: var(--kh-text-muted);
+  text-align: center;
+  margin-top: 0.5rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+// ── WORK PAGE ─────────────────────────────────────────────────────────────────
+.kh-work {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1.25rem;
+  width: 100%;
+}
+
+.kh-player-wrap {
+  width: 100%;
+  margin-bottom: 2.5rem;
+
+  mux-player {
+    width: 100%;
+    display: block;
+  }
+
+  // Aspect ratio variants driven by data attribute
+  &[data-ratio="4:3"] mux-player  { aspect-ratio: 4/3; }
+  &[data-ratio="12:5"] mux-player { aspect-ratio: 12/5; }
+  &[data-ratio="16:9"] mux-player { aspect-ratio: 16/9; }
+}
+
+// Video playlist
+.kh-playlist {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  text-align: center;
+}
+
+.kh-playlist-item {
+  font-size: clamp(0.9rem, 2vw, 1.05rem);
+  line-height: 2;
+  letter-spacing: 0.02em;
+}
+
+.kh-playlist-link {
+  color: var(--kh-text);
+  text-decoration: none;
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: inherit;
+  padding: 0;
+  display: inline;
+  transition: color 0.15s;
+
+  &:hover {
+    text-decoration: underline;
+    color: var(--kh-text);
+  }
+
+  // No special visited style — intentional
+  &:visited {
+    color: var(--kh-text);
+  }
+
+  &.active {
+    color: var(--kh-accent);
+    text-decoration: underline;
+    text-shadow: var(--kh-shadow);
+  }
+}
+
+// ── ABOUT PAGE ────────────────────────────────────────────────────────────────
+.kh-about {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 2rem 1.25rem;
+  text-align: center;
+}
+
+.kh-about-image {
+  width: 100%;
+  max-width: 360px;
+  margin: 0 auto 2rem;
+
+  img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+}
+
+.kh-bio {
+  text-align: left;
+  font-size: 1rem;
+  line-height: 1.8;
+  color: var(--kh-text);
+
+  p + p {
+    margin-top: 1.2rem;
+  }
+}
+
+// ── CONTACT PAGE ─────────────────────────────────────────────────────────────
+.kh-contact {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 3rem 1.25rem;
+  text-align: center;
+}
+
+.kh-contact-section {
+  margin-bottom: 3rem;
+}
+
+// Drop shadow headings — as seen in the PDF contact page
+.kh-contact-heading {
+  font-family: 'Albertus', serif;
+  font-size: 0.85rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--kh-text);
+  text-shadow: var(--kh-shadow);
+  margin-bottom: 1rem;
+}
+
+.kh-contact-name {
+  font-size: 1.1rem;
+  font-weight: normal;
+  margin-bottom: 0.25rem;
+}
+
+.kh-contact-detail {
+  font-size: 0.95rem;
+  color: var(--kh-text);
+  text-decoration: none;
+  display: block;
+  line-height: 1.9;
+
+  &:hover { color: var(--kh-accent); }
+}
+
+// ── REEL PAGE ─────────────────────────────────────────────────────────────────
+.kh-reel-layout {
+  display: flex;
+  height: calc(100vh - 73px);
+  overflow: hidden;
+}
+
+.kh-reel-player {
+  flex: 1;
+  min-width: 0;
+  background: #000;
+  display: flex;
+  flex-direction: column;
+}
+
+.kh-reel-player-area {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000;
+
+  mux-player {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.kh-reel-meta {
+  padding: 0.75rem 1.25rem;
+  border-top: 1px solid var(--kh-border);
+  background: var(--kh-bg-secondary);
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  flex-shrink: 0;
+
+  .meta-title {
+    font-size: 1.1rem;
+    font-family: 'Albertus', serif;
+    letter-spacing: 0.03em;
+  }
+
+  .meta-type {
+    font-size: 0.75rem;
+    color: var(--kh-accent);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-left: auto;
+  }
+}
+
+.kh-reel-sidebar {
+  width: 300px;
+  flex-shrink: 0;
+  border-left: 1px solid var(--kh-border);
+  background: var(--kh-bg-secondary);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.kh-reel-tabs {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--kh-border);
+  display: flex;
+  gap: 0.25rem;
+  flex-wrap: wrap;
+}
+
+.kh-reel-tab {
+  font-family: 'Albertus', serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border: 1px solid transparent;
+  background: none;
+  color: var(--kh-text-muted);
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+
+  &:hover { color: var(--kh-text); }
+
+  &.active {
+    color: var(--kh-text);
+    border-color: var(--kh-border);
+    background: var(--kh-bg);
+  }
+}
+
+.kh-reel-list {
+  overflow-y: auto;
+  flex: 1;
+  scrollbar-width: thin;
+  scrollbar-color: var(--kh-border) transparent;
+}
+
+.kh-reel-item {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--kh-border);
+  cursor: pointer;
+  transition: background 0.12s;
+  position: relative;
+
+  &:hover { background: rgba(128,128,128,0.06); }
+
+  &.active {
+    background: rgba(128,128,128,0.1);
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 2px;
+      background: var(--kh-accent);
+    }
+  }
+}
+
+.kh-reel-thumb {
+  width: 100px;
+  flex-shrink: 0;
+  aspect-ratio: 16/9;
+  overflow: hidden;
+  background: #000;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.8;
+    transition: opacity 0.15s;
+  }
+}
+
+.kh-reel-item:hover .kh-reel-thumb img,
+.kh-reel-item.active .kh-reel-thumb img {
+  opacity: 1;
+}
+
+.kh-reel-info {
+  padding: 0.6rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+
+  .info-artist {
+    font-family: 'Albertus', serif;
+    font-size: 0.9rem;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .info-song {
+    font-size: 0.75rem;
+    color: var(--kh-text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 1px;
+  }
+
+  .info-type {
+    font-size: 0.68rem;
+    color: var(--kh-accent);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-top: 3px;
+  }
+}
+
+// ── ADMIN PAGE ────────────────────────────────────────────────────────────────
+.kh-admin {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1.25rem;
+}
+
+.kh-admin-login {
+  max-width: 360px;
+  margin: 4rem auto;
+  text-align: center;
+}
+
+.kh-admin-header {
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--kh-text-muted);
+  margin-bottom: 2rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--kh-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.kh-admin-card {
+  background: var(--kh-bg-secondary);
+  border: 1px solid var(--kh-border);
+  padding: 1rem;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  cursor: grab;
+  transition: background 0.12s;
+
+  &:hover { background: rgba(128,128,128,0.08); }
+  &.dragging { opacity: 0.5; cursor: grabbing; }
+}
+
+.kh-admin-num {
+  font-size: 0.75rem;
+  color: var(--kh-text-muted);
+  width: 24px;
+  flex-shrink: 0;
+  text-align: center;
+}
+
+.kh-admin-title {
+  flex: 1;
+  font-size: 0.95rem;
+}
+
+.kh-admin-type {
+  font-size: 0.7rem;
+  color: var(--kh-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.kh-admin-drag-handle {
+  color: var(--kh-border);
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+// ── RESPONSIVE ────────────────────────────────────────────────────────────────
+@media (max-width: 768px) {
+  .kh-reel-layout {
+    flex-direction: column;
+    height: auto;
+    overflow: visible;
+  }
+
+  .kh-reel-player {
+    min-height: 56vw;
+  }
+
+  .kh-reel-player-area {
+    min-height: 56vw;
+  }
+
+  .kh-reel-sidebar {
+    width: 100%;
+    border-left: none;
+    border-top: 1px solid var(--kh-border);
+    max-height: 50vh;
+  }
+
+  .kh-nav-logo img {
+    height: 36px;
+  }
+}
+
+@media (max-width: 480px) {
+  .kh-playlist-item {
+    font-size: 0.85rem;
+    line-height: 2.2;
+  }
+
+  .kh-contact-heading {
+    font-size: 0.75rem;
+  }
+}
+
+// ── ADMIN DRAG OVER ───────────────────────────────────────────────────────────
+.kh-admin-card.drag-over {
+  border-color: var(--kh-accent);
+  background: rgba(254, 0, 0, 0.04);
+}

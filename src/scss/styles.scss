@@ -1,0 +1,998 @@
+// ── ALBERTUS FONT ─────────────────────────────────────────────────────────────
+// Font files live in /public/fonts/
+// Vite serves public/ at the root, so /fonts/... resolves correctly in browser.
+// VSCode "click to file" won't follow this path — that's expected, not an error.
+@font-face {
+  font-family: 'Albertus';
+  src: url('/fonts/AlbertusMT.woff2') format('woff2'),
+       url('/fonts/AlbertusMT.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+// ── BOOTSTRAP VARIABLE OVERRIDES ──────────────────────────────────────────────
+// These must come BEFORE importing Bootstrap.
+$font-family-base: 'Albertus', 'Palatino Linotype', 'Book Antiqua', Palatino, serif;
+$headings-font-family: 'Albertus', 'Palatino Linotype', 'Book Antiqua', Palatino, serif;
+$enable-transitions: true;
+$transition-base: all 0.2s ease-in-out;
+
+// ── BOOTSTRAP IMPORT ──────────────────────────────────────────────────────────
+@import '~bootstrap/scss/bootstrap';
+
+// ── COLOR TOKENS ──────────────────────────────────────────────────────────────
+// All color decisions live here. Light mode is the default.
+// Dark mode is applied via [data-bs-theme="dark"] on <html>.
+
+:root,
+[data-bs-theme="light"] {
+  --kh-bg:           rgb(230, 230, 230);
+  --kh-bg-secondary: rgb(218, 218, 218);
+  --kh-text:         #0a0a0a;
+  --kh-text-muted:   #666666;
+  --kh-border:       #c8c8c8;
+  --kh-accent:       #fe0000;
+  --kh-nav-bg:       rgba(230, 230, 230, 0.96);
+  --kh-overlay-bg:   rgba(218, 218, 218, 0.95);
+
+  // ── DROP SHADOW ────────────────────────────────────────────────────────────
+  // Adjust these values to taste:
+  // Format: X-offset Y-offset blur-radius color
+  // Lower blur = sharper/harder shadow. Higher = more diffuse.
+  // Current: 1px right, 2px down, 3px blur — tight and defined.
+  --kh-shadow:       1px 2px 3px rgba(0, 0, 0, 0.45);
+
+  --kh-logo-filter: none;
+}
+
+[data-bs-theme="dark"] {
+  --kh-bg:           #0a0a0a;
+  --kh-bg-secondary: #111111;
+  --kh-text:         #f0f0f0;
+  --kh-text-muted:   #888888;
+  --kh-border:       #2a2a2a;
+  --kh-accent:       #fe0000;
+  --kh-nav-bg:       rgba(10, 10, 10, 0.96);
+  --kh-overlay-bg:   rgba(20, 20, 20, 0.92);
+  --kh-shadow:       2px 3px 6px rgba(0, 0, 0, 0.6);
+}
+
+// ── BASE ──────────────────────────────────────────────────────────────────────
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--kh-bg);
+  color: var(--kh-text);
+  font-family: 'Albertus', 'Palatino Linotype', 'Book Antiqua', Palatino, serif;
+  font-size: 1rem;
+  line-height: 1.6;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  min-height: 100vh;
+}
+
+// ── PRELOADER ─────────────────────────────────────────────────────────────────
+.kh-preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: var(--kh-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.4s ease;
+
+  &.kh-preloader--hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  img {
+    height: 48px;
+    width: auto;
+    animation: kh-pulse 1.2s ease-in-out infinite;
+  }
+}
+
+@keyframes kh-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.3; }
+}
+
+// ── NAVBAR ────────────────────────────────────────────────────────────────────
+.kh-navbar {
+  background-color: var(--kh-nav-bg);
+  backdrop-filter: blur(8px);
+  border-bottom: 0px solid var(--kh-border); //was 1px
+  padding: 0.75rem 1.25rem;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1030;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: background-color 0.3s ease;
+}
+
+// Hide the small logo in the navbar on the home page —
+// the large KEVIN/HAUS wordmark already identifies the page
+[data-page="home"] .kh-nav-logo {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.kh-nav-logo {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+
+  img {
+    height: 48px;
+    width: auto;
+    display: block;
+  }
+}
+
+.kh-nav-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+// Theme toggle button
+.kh-theme-toggle {
+  background: none;
+  border: 1px solid var(--kh-border);
+  color: var(--kh-text);
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+  padding: 0;
+  font-size: 14px;
+
+  &:hover {
+    border-color: var(--kh-text-muted);
+    color: var(--kh-accent);
+  }
+
+  .icon-sun { display: none; }
+  .icon-moon { display: block; }
+}
+
+[data-bs-theme="dark"] .kh-theme-toggle {
+  .icon-sun { display: block; }
+  .icon-moon { display: none; }
+}
+
+// Hamburger button
+// ── To swap to a custom icon: replace the SVG inside .kh-hamburger-icon ──
+.kh-hamburger {
+  background: none;
+  border: none;
+  color: var(--kh-text);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+
+  &:hover {
+    color: var(--kh-accent);
+  }
+}
+
+// ── OFFCANVAS NAV ─────────────────────────────────────────────────────────────
+.kh-offcanvas {
+  background-color: var(--kh-overlay-bg);
+  backdrop-filter: blur(12px);
+  border-left: 1px solid var(--kh-border);
+  width: min(360px, 85vw) !important;
+
+  .offcanvas-header {
+    border-bottom: 1px solid var(--kh-border);
+    padding: 1.25rem 1.5rem;
+  }
+
+  .offcanvas-body {
+    padding: 2rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+}
+
+.kh-offcanvas-logo {
+  img { height: 56px; width: auto; }
+}
+
+.kh-nav-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  margin-top: 1.5rem;
+
+  li {
+    border-bottom: none;
+  }
+}
+
+.kh-nav-link {
+  display: block;
+  font-family: 'Albertus', serif;
+  font-size: 2rem;
+  color: var(--kh-text);
+  text-decoration: none;
+  padding: 0.75rem 0;
+  letter-spacing: 0.03em;
+  transition: color 0.15s;
+
+  &:hover {
+    color: var(--kh-accent);
+    text-decoration: underline;
+  }
+
+  &.active {
+    color: var(--kh-accent);
+    text-decoration: underline;
+  }
+}
+
+.kh-offcanvas-footer {
+  margin-top: auto;
+  padding-top: 2rem;
+  font-size: 0.8rem;
+  color: var(--kh-text-muted);
+}
+
+// ── PAGE WRAPPER ──────────────────────────────────────────────────────────────
+.kh-page {
+  padding-top: 73px; // height of fixed navbar
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+// ── FOOTER ────────────────────────────────────────────────────────────────────
+.kh-footer {
+  margin-top: auto;
+  padding: 2rem 1.25rem 1.5rem;
+  border-top: 0px solid var(--kh-border); //was 1px
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+
+  .kh-footer-logo img {
+    height: 36px;
+    width: auto;
+    opacity: 0.6;
+  }
+
+  .kh-footer-email {
+    display: block;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+
+    &:hover { opacity: 1; }
+  }
+
+  .kh-footer-email-img {
+    height: 48px;
+    width: auto;
+    display: block;
+  }
+}
+
+// ── NAV EMAIL IMAGE ───────────────────────────────────────────────────────────
+.kh-nav-email-img {
+  height: 16px;
+  width: auto;
+  display: block;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+
+  &:hover { opacity: 1; }
+}
+
+// ── HOME PAGE ─────────────────────────────────────────────────────────────────
+.kh-home {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  padding: 0;
+}
+
+// Split wordmark — KEVIN above, HAUS below
+.kh-home-wordmark {
+  width: 100%;
+  max-width: 544px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 0; // removes gap between inline-block img and container
+
+  img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  &--top {
+    padding: 2rem 1.25rem 0;   // space above KEVIN, flush to image below
+  }
+
+  &--bottom {
+    padding: 0 1.25rem 1.5rem; // flush to image above, space below HAUS
+  }
+}
+
+// Still image cycler
+.kh-still-wrap {
+  width: 100%;
+  max-width: 544px;
+  padding: 0 1.25rem;
+  cursor: pointer;
+  position: relative;
+  margin-left: auto;
+  margin-right: auto;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.kh-still {
+  display: block;
+  width: 100%;
+  height: auto;
+  pointer-events: none;
+  -webkit-user-drag: none;
+}
+
+// ── WORK PAGE ─────────────────────────────────────────────────────────────────
+.kh-work {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1.25rem;
+  width: 100%;
+}
+
+.kh-player-wrap {
+  width: 100%;
+  margin-bottom: 2.5rem;
+
+  mux-player {
+    width: 100%;
+    display: block;
+  }
+
+  // Aspect ratio variants driven by data attribute
+  &[data-ratio="4:3"] mux-player  { aspect-ratio: 4/3; }
+  &[data-ratio="12:5"] mux-player { aspect-ratio: 12/5; }
+  &[data-ratio="16:9"] mux-player { aspect-ratio: 16/9; }
+}
+
+// Video playlist
+.kh-playlist {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  text-align: center;
+}
+
+.kh-playlist-item {
+  font-size: clamp(0.9rem, 2vw, 1.05rem);
+  line-height: 2;
+  letter-spacing: 0.02em;
+}
+
+.kh-playlist-link {
+  color: var(--kh-text);
+  text-decoration: none;
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: inherit;
+  padding: 0;
+  display: inline;
+  transition: color 0.15s;
+
+  &:hover {
+    text-decoration: underline;
+    color: var(--kh-text);
+  }
+
+  // No special visited style — intentional
+  &:visited {
+    color: var(--kh-text);
+  }
+
+  &.active {
+    color: var(--kh-accent);
+    text-decoration: underline;
+    text-shadow: var(--kh-shadow);
+  }
+}
+
+// ── ABOUT PAGE ────────────────────────────────────────────────────────────────
+.kh-about {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 2rem 1.25rem;
+  text-align: center;
+}
+
+.kh-about-image {
+  width: 100%;
+  max-width: 360px;
+  margin: 0 auto 2rem;
+
+  img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+}
+
+.kh-bio {
+  text-align: left;
+  font-size: 1rem;
+  line-height: 1.8;
+  color: var(--kh-text);
+
+  p + p {
+    margin-top: 1.2rem;
+  }
+}
+
+// ── CONTACT PAGE ─────────────────────────────────────────────────────────────
+.kh-contact {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 3rem 1.25rem;
+  text-align: center;
+}
+
+.kh-contact-section {
+  margin-bottom: 3rem;
+}
+
+// Drop shadow headings — as seen in the PDF contact page
+.kh-contact-heading {
+  font-family: 'Albertus', serif;
+  font-size: 0.85rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--kh-text);
+  text-shadow: var(--kh-shadow);
+  margin-bottom: 1rem;
+}
+
+.kh-contact-name {
+  font-size: 1.1rem;
+  font-weight: normal;
+  margin-bottom: 0.25rem;
+}
+
+.kh-contact-detail {
+  font-size: 0.95rem;
+  color: var(--kh-text);
+  text-decoration: none;
+  display: block;
+  line-height: 1.9;
+
+  &:hover { color: var(--kh-accent); }
+}
+
+// Social links — contact page only
+.kh-contact-social {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-top: 2.5rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--kh-border);
+}
+
+.kh-social-link {
+  display: block;
+  color: var(--kh-text);
+  transition: color 0.2s;
+
+  &:hover { color: var(--kh-text); }
+}
+
+.kh-social-img {
+  height: 32px;
+  width: auto;
+  display: block;
+}
+
+// ── REEL PAGE ─────────────────────────────────────────────────────────────────
+.kh-reel-layout {
+  display: flex;
+  height: calc(100vh - 73px);
+  overflow: hidden;
+}
+
+.kh-reel-player {
+  flex: 1;
+  min-width: 0;
+  background: #000;
+  display: flex;
+  flex-direction: column;
+}
+
+.kh-reel-player-area {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000;
+
+  mux-player {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.kh-reel-meta {
+  padding: 0.75rem 1.25rem;
+  border-top: 1px solid var(--kh-border);
+  background: var(--kh-bg-secondary);
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  flex-shrink: 0;
+
+  .meta-title {
+    font-size: 1.1rem;
+    font-family: 'Albertus', serif;
+    letter-spacing: 0.03em;
+  }
+
+  .meta-type {
+    font-size: 0.75rem;
+    color: var(--kh-accent);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-left: auto;
+  }
+}
+
+.kh-reel-sidebar {
+  width: 300px;
+  flex-shrink: 0;
+  border-left: 1px solid var(--kh-border);
+  background: var(--kh-bg-secondary);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.kh-reel-tabs {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--kh-border);
+  display: flex;
+  gap: 0.25rem;
+  flex-wrap: wrap;
+}
+
+.kh-reel-tab {
+  font-family: 'Albertus', serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border: 1px solid transparent;
+  background: none;
+  color: var(--kh-text-muted);
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+
+  &:hover { color: var(--kh-text); }
+
+  &.active {
+    color: var(--kh-text);
+    border-color: var(--kh-border);
+    background: var(--kh-bg);
+  }
+}
+
+.kh-reel-list {
+  overflow-y: auto;
+  flex: 1;
+  scrollbar-width: thin;
+  scrollbar-color: var(--kh-border) transparent;
+}
+
+.kh-reel-item {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--kh-border);
+  cursor: pointer;
+  transition: background 0.12s;
+  position: relative;
+
+  &:hover { background: rgba(128,128,128,0.06); }
+
+  &.active {
+    background: rgba(128,128,128,0.1);
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 2px;
+      background: var(--kh-accent);
+    }
+  }
+}
+
+.kh-reel-thumb {
+  width: 100px;
+  flex-shrink: 0;
+  aspect-ratio: 16/9;
+  overflow: hidden;
+  background: #000;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.8;
+    transition: opacity 0.15s;
+  }
+}
+
+.kh-reel-item:hover .kh-reel-thumb img,
+.kh-reel-item.active .kh-reel-thumb img {
+  opacity: 1;
+}
+
+.kh-reel-info {
+  padding: 0.6rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+
+  .info-artist {
+    font-family: 'Albertus', serif;
+    font-size: 0.9rem;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .info-song {
+    font-size: 0.75rem;
+    color: var(--kh-text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 1px;
+  }
+
+  .info-type {
+    font-size: 0.68rem;
+    color: var(--kh-accent);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-top: 3px;
+  }
+}
+
+// ── ADMIN PAGE ────────────────────────────────────────────────────────────────
+.kh-admin {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1.25rem;
+}
+
+.kh-admin-login {
+  max-width: 360px;
+  margin: 4rem auto;
+  text-align: center;
+}
+
+.kh-admin-header {
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--kh-text-muted);
+  margin-bottom: 2rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--kh-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.kh-admin-card {
+  background: var(--kh-bg-secondary);
+  border: 1px solid var(--kh-border);
+  padding: 1rem;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  cursor: grab;
+  transition: background 0.12s;
+
+  &:hover { background: rgba(128,128,128,0.08); }
+  &.dragging { opacity: 0.5; cursor: grabbing; }
+}
+
+.kh-admin-num {
+  font-size: 0.75rem;
+  color: var(--kh-text-muted);
+  width: 24px;
+  flex-shrink: 0;
+  text-align: center;
+}
+
+.kh-admin-title {
+  flex: 1;
+  font-size: 0.95rem;
+}
+
+.kh-admin-type {
+  font-size: 0.7rem;
+  color: var(--kh-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.kh-admin-drag-handle {
+  color: var(--kh-border);
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+// ── RESPONSIVE ────────────────────────────────────────────────────────────────
+// Mobile-first. Base styles above target all sizes.
+// Breakpoints: 390px (phone), 480px (large phone), 768px (tablet), 1024px (desktop)
+
+// ── 390px and up — small phones (base, already handled above) ─────────────────
+
+// ── 480px and up — large phones ───────────────────────────────────────────────
+@media (min-width: 480px) {
+  .kh-home-wordmark--top {
+    padding: 2.5rem 1.5rem 0;
+  }
+
+  .kh-home-wordmark--bottom {
+    padding: 0 1.5rem 1.75rem;
+  }
+
+  .kh-playlist-item {
+    font-size: 0.95rem;
+    line-height: 2.1;
+  }
+}
+
+// ── 768px and up — tablets ────────────────────────────────────────────────────
+@media (min-width: 768px) {
+  // Nav
+  .kh-nav-logo img {
+    height: 48px;
+  }
+
+  // Home
+  .kh-home-wordmark--top {
+    padding: 3rem 1.25rem 0;
+  }
+
+  .kh-home-wordmark--bottom {
+    padding: 0 1.25rem 2rem;
+  }
+
+  .kh-still-wrap {
+    padding: 0 1.25rem;
+  }
+
+  // Work
+  .kh-work {
+    padding: 2.5rem 2rem;
+  }
+
+  .kh-player-wrap {
+    margin-bottom: 3rem;
+  }
+
+  .kh-playlist-item {
+    font-size: 1rem;
+    line-height: 2;
+  }
+
+  // About
+  .kh-about {
+    padding: 3rem 2rem;
+  }
+
+  .kh-about-image {
+    max-width: 420px;
+    margin-bottom: 2.5rem;
+  }
+
+  // Contact
+  .kh-contact {
+    padding: 4rem 2rem;
+  }
+
+  .kh-contact-section {
+    margin-bottom: 3.5rem;
+  }
+
+  .kh-contact-heading {
+    font-size: 0.9rem;
+  }
+
+  .kh-contact-name {
+    font-size: 1.2rem;
+  }
+
+  .kh-contact-detail {
+    font-size: 1rem;
+  }
+}
+
+// ── 1024px and up — desktop ───────────────────────────────────────────────────
+@media (min-width: 1024px) {
+  // Work — wider player
+  .kh-work {
+    max-width: 1000px;
+    padding: 3rem 2rem;
+  }
+
+  .kh-player-wrap {
+    margin-bottom: 3.5rem;
+  }
+
+  .kh-playlist-item {
+    font-size: clamp(0.95rem, 1.2vw, 1.1rem);
+    line-height: 2;
+  }
+
+  // About
+  .kh-about {
+    max-width: 720px;
+  }
+
+  // Contact
+  .kh-contact {
+    max-width: 720px;
+  }
+}
+
+// ── MAX-WIDTH CAPS — prevent over-stretch on very wide screens ────────────────
+@media (min-width: 1440px) {
+  .kh-home-wordmark,
+  .kh-still-wrap {
+    max-width: 544px;
+  }
+
+  .kh-work {
+    max-width: 1100px;
+  }
+}
+
+// ── MOBILE-SPECIFIC OVERRIDES (max-width) ─────────────────────────────────────
+// Only use these for things that genuinely need to be different on small screens,
+// not just scaled — e.g. layout changes, touch target sizes.
+
+@media (max-width: 767px) {
+  // Home wordmark and still — 80% of desktop size on mobile
+  // Desktop max-width is 544px, 80% = 435px
+  .kh-home-wordmark,
+  .kh-still-wrap {
+    max-width: 435px;
+  }
+
+  // Reel page stacks vertically on mobile
+  .kh-reel-layout {
+    flex-direction: column;
+    height: auto;
+    overflow: visible;
+  }
+
+  .kh-reel-player {
+    min-height: 56vw;
+  }
+
+  .kh-reel-player-area {
+    min-height: 56vw;
+  }
+
+  .kh-reel-sidebar {
+    width: 100%;
+    border-left: none;
+    border-top: 1px solid var(--kh-border);
+    max-height: 50vh;
+  }
+
+  // Larger touch targets for playlist on mobile
+  .kh-playlist-link {
+    padding: 0.25rem 0;
+    display: block;
+    width: 100%;
+    text-align: center;
+  }
+
+  // Nav offcanvas — slightly smaller links on very small screens
+  .kh-nav-link {
+    font-size: 1.75rem;
+  }
+
+  // Footer image sizing
+  .kh-footer-email-img {
+    height: 16px;
+  }
+
+  // Contact page — tighter on mobile
+  .kh-contact {
+    padding: 2rem 1.25rem;
+  }
+
+  .kh-contact-section {
+    margin-bottom: 2rem;
+  }
+
+  // About page image — full width on small screens
+  .kh-about-image {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 390px) {
+  // Very small phones — tighten everything slightly
+  .kh-work {
+    padding: 1.25rem 1rem;
+  }
+
+  .kh-about {
+    padding: 1.5rem 1rem;
+  }
+
+  .kh-contact {
+    padding: 1.5rem 1rem;
+  }
+
+  .kh-playlist-item {
+    font-size: 0.8rem;
+    line-height: 2.3;
+  }
+
+  .kh-nav-link {
+    font-size: 1.5rem;
+    padding: 0.6rem 0;
+  }
+}
+
+// ── ADMIN DRAG OVER ───────────────────────────────────────────────────────────
+.kh-admin-card.drag-over {
+  border-color: var(--kh-accent);
+  background: rgba(254, 0, 0, 0.04);
+}
