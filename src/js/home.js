@@ -1,27 +1,11 @@
-import videos from '../videos.json'
 import config from './site.config.js'
 import navHtml from '../pages/nav.html?raw'
 
 // ── INJECT NAV ────────────────────────────────────────────────────────────────
-// Vite loads this as a deferred module so DOM is ready at this point
 const navMount = document.getElementById('kh-nav-mount')
 if (navMount) navMount.innerHTML = navHtml
 
-// ── BUILD STILL POOL ──────────────────────────────────────────────────────────
-const stillPool = []
-
-videos.forEach(video => {
-  if (video.stills && video.stills.length > 0) {
-    video.stills.forEach(filename => {
-      stillPool.push({
-        src: `${config.assetsBase}/Stills/${filename}`,
-        videoId: video.id,
-        videoTitle: video.title,
-      })
-    })
-  }
-})
-
+// ── SHUFFLE ───────────────────────────────────────────────────────────────────
 function shuffle(arr) {
   const a = [...arr]
   for (let i = a.length - 1; i > 0; i--) {
@@ -31,26 +15,61 @@ function shuffle(arr) {
   return a
 }
 
-let pool           = shuffle(stillPool)
-let currentIndex   = 0
-let currentVideoId = null
-let cycleTimer     = null
-
 function preload(src) {
   const img = new Image()
   img.src = src
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
 
   const stillImg  = document.getElementById('stillImg')
   const stillWrap = document.getElementById('stillWrap')
+  if (!stillWrap || !stillImg) return
 
-  if (!stillWrap || !stillImg || !pool.length) {
-    if (stillWrap) stillWrap.style.display = 'none'
+  // ── FETCH VIDEOS ───────────────────────────────────────────────────────────
+  let videoData = []
+  try {
+    const res = await fetch('/.netlify/functions/get-videos')
+    const data = await res.json()
+    videoData = Array.isArray(data) ? data : []
+
+    // Fall back to bundled JSON if Blobs is empty
+    if (videoData.length === 0) {
+      const fallback = await import('../videos.json')
+      videoData = fallback.default || []
+    }
+  } catch {
+    // Fall back to bundled JSON on any network error
+    try {
+      const fallback = await import('../videos.json')
+      videoData = fallback.default || []
+    } catch { videoData = [] }
+  }
+
+  // ── BUILD STILL POOL ───────────────────────────────────────────────────────
+  const stillPool = []
+  videoData.forEach(video => {
+    if (video.stills && video.stills.length > 0) {
+      video.stills.forEach(filename => {
+        stillPool.push({
+          src: `${config.assetsBase}/Stills/${filename}`,
+          videoId: video.id,
+          videoTitle: video.title,
+        })
+      })
+    }
+  })
+
+  if (stillPool.length === 0) {
+    stillWrap.style.display = 'none'
     return
   }
+
+  let pool           = shuffle(stillPool)
+  let currentIndex   = 0
+  let currentVideoId = null
+  let cycleTimer     = null
 
   // ── SHOW STILL ─────────────────────────────────────────────────────────────
   function showStill(index) {
@@ -58,7 +77,6 @@ document.addEventListener('DOMContentLoaded', () => {
     currentVideoId = item.videoId
     stillImg.src = item.src
     stillImg.alt = item.videoTitle
-    // Preload neighbours for instant response to swipe
     preload(pool[(index + 1) % pool.length].src)
     preload(pool[(index - 1 + pool.length) % pool.length].src)
   }
@@ -97,10 +115,6 @@ document.addEventListener('DOMContentLoaded', () => {
   stillWrap.addEventListener('touchstart', e => {
     touchStartX = e.touches[0].clientX
     touchStartY = e.touches[0].clientY
-  }, { passive: true })
-
-  stillWrap.addEventListener('touchmove', e => {
-    // don't block vertical scrolling
   }, { passive: true })
 
   stillWrap.addEventListener('touchend', e => {

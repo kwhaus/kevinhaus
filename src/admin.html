@@ -6,7 +6,7 @@
   <title>Kevin Haus — Admin</title>
   <!-- No index by search engines -->
   <meta name="robots" content="noindex, nofollow">
-  <link rel="icon" type="image/png" sizes="32x32" href="https://kevinhaus.com/assets/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png">
   <script type="module" src="./js/main.js"></script>
   <script type="module" src="./js/admin.js"></script>
 </head>
@@ -90,14 +90,12 @@
           </div>
         </div>
 
-        <!-- Download button -->
+        <!-- Save button -->
         <div style="margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid var(--kh-border); display:flex; gap:1rem; align-items:center;">
           <button id="downloadJson" class="btn btn-outline-secondary" style="font-family:inherit; letter-spacing:0.08em;">
-            ↓ Download videos.json
+            ↑ Save to Live Site
           </button>
-          <span style="font-size:0.75rem; color:var(--kh-text-muted);">
-            Save to <code>src/videos.json</code>, then run <code>npm run build</code>
-          </span>
+          <span id="saveStatus" style="font-size:0.85rem;"></span>
         </div>
 
       </div>
@@ -106,9 +104,9 @@
     <footer class="kh-footer">
       <div class="kh-footer-logo">
         <img
-          src="https://kevinhaus.com/assets/KH_Square.png"
-          data-logo-light="https://kevinhaus.com/assets/KH_Square.png"
-          data-logo-dark="https://kevinhaus.com/assets/KH_Square_wht.png"
+          src="/assets/KH_Square.png"
+          data-logo-light="/assets/KH_Square.png"
+          data-logo-dark="/assets/KH_Square_wht.png"
           data-logo-swap
           alt="KH"
         >

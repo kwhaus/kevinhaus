@@ -1,14 +1,36 @@
-import videos from '../videos.json'
 import config from './site.config.js'
 import navHtml from '../pages/nav.html?raw'
 
 // ── INJECT NAV ────────────────────────────────────────────────────────────────
 document.getElementById('kh-nav-mount').innerHTML = navHtml
 
-// ── STRUCTURED DATA — VideoObject ItemList ────────────────────────────────────
-// Injected into <head> so search engines can index each video.
-// Updates automatically whenever videos.json changes — no manual maintenance.
-;(function injectVideoSchema() {
+// ── ROMAN NUMERALS ────────────────────────────────────────────────────────────
+const ROMAN = ['I','II','III','IV','V','VI','VII','VIII','IX','X',
+               'XI','XII','XIII','XIV','XV','XVI','XVII','XVIII','XIX','XX']
+
+function toRoman(n) {
+  return ROMAN[n - 1] || String(n)
+}
+
+// ── POSTER URL ────────────────────────────────────────────────────────────────
+function getPosterUrl(video) {
+  if (video.coverImage) {
+    return `${config.assetsBase}/Covers/${video.coverImage}`
+  }
+  const time = video.thumbnailTime ?? 3
+  return `https://image.mux.com/${video.playbackId}/thumbnail.webp?time=${time}&width=1280`
+}
+
+// ── PRELOAD ALL COVERS ────────────────────────────────────────────────────────
+function preloadAllCovers(videos) {
+  videos.forEach(video => {
+    const img = new Image()
+    img.src = getPosterUrl(video)
+  })
+}
+
+// ── STRUCTURED DATA ───────────────────────────────────────────────────────────
+function injectVideoSchema(videos) {
   const schema = {
     "@context": "https://schema.org",
     "@type": "ItemList",
@@ -28,10 +50,6 @@ document.getElementById('kh-nav-mount').innerHTML = navHtml
           "@type": "Person",
           "name": "Kevin Haus",
           "url": "https://kevinhaus.com"
-        },
-        "productionCompany": {
-          "@type": "Organization",
-          "name": "Kevin Haus"
         }
       }
     }))
@@ -40,38 +58,6 @@ document.getElementById('kh-nav-mount').innerHTML = navHtml
   script.type = 'application/ld+json'
   script.textContent = JSON.stringify(schema)
   document.head.appendChild(script)
-})()
-
-// ── ROMAN NUMERALS ────────────────────────────────────────────────────────────
-const ROMAN = ['I','II','III','IV','V','VI','VII','VIII','IX','X',
-               'XI','XII','XIII','XIV','XV','XVI','XVII','XVIII','XIX','XX']
-
-function toRoman(n) {
-  return ROMAN[n - 1] || String(n)
-}
-
-// ── POSTER URL ────────────────────────────────────────────────────────────────
-// Builds the poster/cover URL for a video.
-// Uses the custom cover image from assets/Covers/ if present in videos.json.
-// Falls back to Mux's auto-generated thumbnail if no coverImage is set.
-// thumbnailTime can be overridden per-video in videos.json e.g. "thumbnailTime": 8
-function getPosterUrl(video) {
-  if (video.coverImage) {
-    return `${config.assetsBase}/Covers/${video.coverImage}`
-  }
-  const time = video.thumbnailTime ?? 3
-  return `https://image.mux.com/${video.playbackId}/thumbnail.webp?time=${time}&width=1280`
-}
-
-// ── PRELOAD ALL COVERS ────────────────────────────────────────────────────────
-// Fires immediately on page load, fetching all cover images into the browser
-// cache in the background. By the time a user clicks any playlist item,
-// its cover is already cached and appears instantly.
-function preloadAllCovers() {
-  videos.forEach(video => {
-    const img = new Image()
-    img.src = getPosterUrl(video)
-  })
 }
 
 // ── DOM REFS ──────────────────────────────────────────────────────────────────
@@ -81,6 +67,7 @@ const playlist   = document.getElementById('playlist')
 
 // ── STATE ─────────────────────────────────────────────────────────────────────
 let activeId = null
+let videos   = []
 
 // ── LOAD VIDEO ────────────────────────────────────────────────────────────────
 function loadVideo(id) {
@@ -89,25 +76,19 @@ function loadVideo(id) {
 
   activeId = id
 
-  // Set poster first so it shows immediately while player initialises
   const posterUrl = getPosterUrl(video)
   player.setAttribute('poster', posterUrl)
   player.setAttribute('playback-id', video.playbackId)
   player.setAttribute('metadata-video-title', video.title)
 
-  // Update aspect ratio wrapper
   playerWrap.dataset.ratio = video.aspectRatio
-
-  // Scroll player to top on every selection
   playerWrap.scrollIntoView({ behavior: 'smooth', block: 'start' })
 
-  // Update active link styling
   document.querySelectorAll('.kh-playlist-link').forEach(btn => {
     const isActive = parseInt(btn.dataset.id) === id
     btn.classList.toggle('active', isActive)
   })
 
-  // Update URL without page reload so back button works
   const url = new URL(window.location)
   url.searchParams.set('v', id)
   history.pushState({ videoId: id }, '', url)
@@ -118,15 +99,14 @@ function buildPlaylist() {
   playlist.innerHTML = ''
 
   videos.forEach((video, index) => {
-    const li = document.createElement('li')
+    const li  = document.createElement('li')
     li.className = 'kh-playlist-item'
 
     const btn = document.createElement('button')
-    btn.className = 'kh-playlist-link'
-    btn.dataset.id = video.id
-    btn.type = 'button'
-    btn.innerHTML = `${toRoman(index + 1)}.&nbsp;&nbsp;${video.title}`
-
+    btn.className   = 'kh-playlist-link'
+    btn.dataset.id  = video.id
+    btn.type        = 'button'
+    btn.innerHTML   = `${toRoman(index + 1)}.&nbsp;&nbsp;${video.title}`
     btn.addEventListener('click', () => loadVideo(video.id))
 
     li.appendChild(btn)
@@ -135,25 +115,52 @@ function buildPlaylist() {
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
-buildPlaylist()
+async function init() {
+  try {
+    // Show loading state in playlist
+    playlist.innerHTML = '<li style="opacity:0.4; padding: 0.5rem 0;">Loading...</li>'
 
-// Kick off background preload of all cover images immediately
-preloadAllCovers()
+    const res  = await fetch('/.netlify/functions/get-videos')
+    const data = await res.json()
+    videos = Array.isArray(data) ? data : []
 
-// Check for ?v= URL param (from home page still click or direct link)
-const params = new URLSearchParams(window.location.search)
-const paramId = parseInt(params.get('v'))
+    // If Blobs is empty on first run, fall back to bundled JSON
+    if (videos.length === 0) {
+      const fallback = await import('../videos.json')
+      videos = fallback.default || []
+    }
 
-if (paramId && videos.find(v => v.id === paramId)) {
-  loadVideo(paramId)
-} else {
-  loadVideo(videos[0].id)
+    buildPlaylist()
+    preloadAllCovers(videos)
+    injectVideoSchema(videos)
+
+    const params  = new URLSearchParams(window.location.search)
+    const paramId = parseInt(params.get('v'))
+
+    if (paramId && videos.find(v => v.id === paramId)) {
+      loadVideo(paramId)
+    } else {
+      loadVideo(videos[0].id)
+    }
+
+  } catch (err) {
+    console.error('work.js init error:', err)
+    // Fall back to bundled JSON on any error
+    try {
+      const fallback = await import('../videos.json')
+      videos = fallback.default || []
+      buildPlaylist()
+      preloadAllCovers(videos)
+      if (videos.length > 0) loadVideo(videos[0].id)
+    } catch (e) {
+      playlist.innerHTML = '<li style="color:red;">Failed to load videos</li>'
+    }
+  }
 }
+
+init()
 
 // Handle browser back/forward
 window.addEventListener('popstate', (e) => {
-  if (e.state && e.state.videoId) {
-    loadVideo(e.state.videoId)
-  }
+  if (e.state && e.state.videoId) loadVideo(e.state.videoId)
 })
-
