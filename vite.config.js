@@ -28,15 +28,9 @@ export default defineConfig({
           if (id.includes('videos.json'))            return 'videos'
         },
       },
-      // Exclude Node-only packages from the browser bundle
-      external: (id) => {
-        if (id.includes('@netlify/blobs')) return true
-        return false
-      },
     },
   },
 
-  // Tell Vite not to try to resolve Node-only packages
   optimizeDeps: {
     exclude: ['@netlify/blobs'],
   },
