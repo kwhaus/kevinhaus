@@ -4,49 +4,85 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Kevin Haus — Reel</title>
-  <meta name="description" content="Selected work by Kevin Haus — director.">
-  <link rel="icon" type="image/png" sizes="32x32" href="https://kevinhaus.com/assets/favicon-32x32.png">
-  <link rel="apple-touch-icon" href="https://kevinhaus.com/assets/apple-touch-icon.png">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png">
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
   <script src="https://cdn.jsdelivr.net/npm/@mux/mux-player" defer></script>
   <script type="module" src="./js/main.js"></script>
   <script type="module" src="./js/reel.js"></script>
 </head>
 <body>
 
+  <!-- Preloader -->
+  <div class="kh-preloader" id="khPreloader">
+    <img
+      src="/assets/KH_Square.png"
+      data-logo-light="/assets/KH_Square.png"
+      data-logo-dark="/assets/KH_Square_wht.png"
+      data-logo-swap
+      alt=""
+    >
+  </div>
+
   <!-- Nav injected by JS -->
   <div id="kh-nav-mount"></div>
 
-  <div class="kh-page" style="padding-top: 73px;">
-    <div class="kh-reel-layout">
+  <main class="kh-page">
+    <div class="kh-reel-viewer" id="reelViewer">
 
-      <!-- Main player (left) -->
-      <div class="kh-reel-player">
-        <div class="kh-reel-player-area" id="reelPlayerArea">
-          <!-- mux-player injected by reel.js -->
-          <div id="reelEmpty" style="display:flex; align-items:center; justify-content:center; height:100%; color:var(--kh-text-muted); font-size:0.85rem; letter-spacing:0.1em; text-transform:uppercase;">
-            Select a video
+      <!-- Reel name — injected by JS -->
+      <h1 class="kh-reel-viewer-title" id="reelViewerTitle" style="display:none;"></h1>
+
+      <!-- Layout: player left, playlist right -->
+      <div class="kh-reel-viewer-layout" id="reelViewerLayout" style="display:none;">
+
+        <!-- Player column -->
+        <div class="kh-reel-viewer-player-col">
+          <div class="kh-reel-viewer-wrap" id="reelPlayerWrap" data-ratio="16:9">
+            <mux-player
+              id="reelPlayer"
+              stream-type="on-demand"
+              controls
+              style="width:100%; height:100%; display:block;"
+            ></mux-player>
           </div>
         </div>
-        <div class="kh-reel-meta" id="reelMeta" style="display:none;">
-          <span class="meta-title" id="reelMetaTitle"></span>
-          <span class="meta-type" id="reelMetaType"></span>
+
+        <!-- Playlist column -->
+        <div class="kh-reel-viewer-playlist-col">
+          <div id="reelPlaylist"></div>
         </div>
+
       </div>
 
-      <!-- Sidebar (right) -->
-      <aside class="kh-reel-sidebar">
-        <!-- Tabs -->
-        <div class="kh-reel-tabs" id="reelTabs">
-          <!-- Injected by reel.js -->
-        </div>
-        <!-- Video list -->
-        <div class="kh-reel-list" id="reelList">
-          <!-- Injected by reel.js -->
-        </div>
-      </aside>
+      <!-- Message shown while loading or on error -->
+      <div class="kh-reel-viewer-message" id="reelMessage">Loading...</div>
 
     </div>
-  </div>
+
+    <!-- Footer — same as about/contact but no social icons -->
+    <footer class="kh-footer">
+      <div class="kh-footer-logo">
+        <img
+          src="/assets/KH_Square.png"
+          data-logo-light="/assets/KH_Square.png"
+          data-logo-dark="/assets/KH_Square_wht.png"
+          data-logo-swap
+          alt="KH"
+        >
+      </div>
+      <a href="mailto:hello@kevinhaus.com" class="kh-footer-email">
+        <img
+          src="/assets/hello_blk.png"
+          data-logo-light="/assets/hello_blk.png"
+          data-logo-dark="/assets/hello_wht.png"
+          data-logo-swap
+          alt="hello@kevinhaus.com"
+          class="kh-footer-email-img"
+        >
+      </a>
+    </footer>
+  </main>
 
 </body>
 </html>

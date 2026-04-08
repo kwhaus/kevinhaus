@@ -525,132 +525,84 @@ body {
   display: block;
 }
 
-// ── REEL PAGE ─────────────────────────────────────────────────────────────────
-.kh-reel-layout {
-  display: flex;
-  height: calc(100vh - 73px);
-  overflow: hidden;
+// ── REEL VIEWER PAGE ──────────────────────────────────────────────────────────
+// Client-facing reel viewer at kevinhaus.com/reel.html?id=...
+.kh-reel-viewer {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2rem 1.25rem;
+  width: 100%;
 }
 
-.kh-reel-player {
+.kh-reel-viewer-title {
+  font-family: 'Albertus', serif;
+  font-size: 1rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--kh-text-muted);
+  margin-bottom: 1.5rem;
+  font-weight: normal;
+}
+
+.kh-reel-viewer-layout {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
+}
+
+.kh-reel-viewer-player-col {
   flex: 1;
   min-width: 0;
-  background: #000;
-  display: flex;
-  flex-direction: column;
 }
 
-.kh-reel-player-area {
-  flex: 1;
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.kh-reel-viewer-wrap {
+  width: 100%;
   background: #000;
+  position: relative;
+
+  &[data-ratio="16:9"]  { aspect-ratio: 16/9; }
+  &[data-ratio="4:3"]   { aspect-ratio: 4/3; }
+  &[data-ratio="12:5"]  { aspect-ratio: 12/5; }
+  &[data-ratio="1:1"]   { aspect-ratio: 1; }
 
   mux-player {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
+    display: block;
   }
 }
 
-.kh-reel-meta {
-  padding: 0.75rem 1.25rem;
-  border-top: 1px solid var(--kh-border);
-  background: var(--kh-bg-secondary);
-  display: flex;
-  align-items: baseline;
-  gap: 1rem;
+.kh-reel-viewer-playlist-col {
+  width: 240px;
   flex-shrink: 0;
-
-  .meta-title {
-    font-size: 1.1rem;
-    font-family: 'Albertus', serif;
-    letter-spacing: 0.03em;
-  }
-
-  .meta-type {
-    font-size: 0.75rem;
-    color: var(--kh-accent);
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    margin-left: auto;
-  }
-}
-
-.kh-reel-sidebar {
-  width: 300px;
-  flex-shrink: 0;
-  border-left: 1px solid var(--kh-border);
-  background: var(--kh-bg-secondary);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-.kh-reel-tabs {
-  padding: 0.75rem 1rem;
-  border-bottom: 1px solid var(--kh-border);
-  display: flex;
-  gap: 0.25rem;
-  flex-wrap: wrap;
-}
-
-.kh-reel-tab {
-  font-family: 'Albertus', serif;
-  font-size: 0.75rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  padding: 4px 10px;
-  border: 1px solid transparent;
-  background: none;
-  color: var(--kh-text-muted);
-  cursor: pointer;
-  transition: color 0.15s, border-color 0.15s;
-
-  &:hover { color: var(--kh-text); }
-
-  &.active {
-    color: var(--kh-text);
-    border-color: var(--kh-border);
-    background: var(--kh-bg);
-  }
-}
-
-.kh-reel-list {
+  max-height: 70vh;
   overflow-y: auto;
-  flex: 1;
   scrollbar-width: thin;
   scrollbar-color: var(--kh-border) transparent;
 }
 
-.kh-reel-item {
+.kh-reel-viewer-item {
   display: flex;
-  gap: 0;
-  border-bottom: 1px solid var(--kh-border);
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.5rem;
   cursor: pointer;
+  border: 1px solid transparent;
+  border-bottom-color: var(--kh-border);
   transition: background 0.12s;
-  position: relative;
 
   &:hover { background: rgba(128,128,128,0.06); }
 
   &.active {
-    background: rgba(128,128,128,0.1);
-
-    &::before {
-      content: '';
-      position: absolute;
-      left: 0; top: 0; bottom: 0;
-      width: 2px;
-      background: var(--kh-accent);
-    }
+    background: var(--kh-bg-secondary);
+    border-color: var(--kh-border);
   }
 }
 
-.kh-reel-thumb {
-  width: 100px;
+.kh-reel-viewer-thumb {
+  width: 80px;
   flex-shrink: 0;
   aspect-ratio: 16/9;
   overflow: hidden;
@@ -660,48 +612,44 @@ body {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    opacity: 0.8;
+    display: block;
+    opacity: 0.85;
     transition: opacity 0.15s;
   }
 }
 
-.kh-reel-item:hover .kh-reel-thumb img,
-.kh-reel-item.active .kh-reel-thumb img {
+.kh-reel-viewer-item:hover .kh-reel-viewer-thumb img,
+.kh-reel-viewer-item.active .kh-reel-viewer-thumb img {
   opacity: 1;
 }
 
-.kh-reel-info {
-  padding: 0.6rem 0.75rem;
+.kh-reel-viewer-info {
+  flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  min-width: 0;
+  gap: 0.2rem;
+}
 
-  .info-artist {
-    font-family: 'Albertus', serif;
-    font-size: 0.9rem;
-    letter-spacing: 0.02em;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
+.kh-reel-viewer-num {
+  font-size: 0.65rem;
+  color: var(--kh-text-muted);
+  letter-spacing: 0.08em;
+}
 
-  .info-song {
-    font-size: 0.75rem;
-    color: var(--kh-text-muted);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    margin-top: 1px;
-  }
+.kh-reel-viewer-name {
+  font-size: 0.8rem;
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
-  .info-type {
-    font-size: 0.68rem;
-    color: var(--kh-accent);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    margin-top: 3px;
-  }
+.kh-reel-viewer-message {
+  padding: 3rem 0;
+  font-size: 0.85rem;
+  color: var(--kh-text-muted);
+  letter-spacing: 0.08em;
 }
 
 // ── ADMIN PAGE ────────────────────────────────────────────────────────────────
@@ -979,26 +927,14 @@ body {
     max-width: 435px;
   }
 
-  // Reel page stacks vertically on mobile
-  .kh-reel-layout {
+  // Reel viewer stacks vertically on mobile
+  .kh-reel-viewer-layout {
     flex-direction: column;
-    height: auto;
-    overflow: visible;
   }
 
-  .kh-reel-player {
-    min-height: 56vw;
-  }
-
-  .kh-reel-player-area {
-    min-height: 56vw;
-  }
-
-  .kh-reel-sidebar {
+  .kh-reel-viewer-playlist-col {
     width: 100%;
-    border-left: none;
-    border-top: 1px solid var(--kh-border);
-    max-height: 50vh;
+    max-height: 40vh;
   }
 
   // Larger touch targets for playlist on mobile

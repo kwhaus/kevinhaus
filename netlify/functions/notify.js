@@ -46,7 +46,7 @@ export default async (req, context) => {
         'Authorization': `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        from: 'Kevin Haus Reels <onboarding@resend.dev>',
+        from: 'Kevin Haus <hello@kevinhaus.com>',
         to: 'hello@kevinhaus.com',
         subject: `Reel viewed: ${clientName || reelId}`,
         html: `

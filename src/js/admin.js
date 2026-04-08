@@ -266,7 +266,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       reelsList.innerHTML = ''
       reels.forEach(reel => {
-        const url  = `https://reels.kevinhaus.com/?id=${reel.id}`
+        const url  = `https://kevinhaus.com/reel.html?id=${reel.id}`
         const row  = document.createElement('div')
         row.style.cssText = 'display:flex; align-items:center; gap:1rem; padding:0.5rem 0; border-bottom:1px solid var(--kh-border); font-size:0.85rem;'
         row.innerHTML = `
@@ -380,7 +380,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const data = await res.json()
 
         if (res.ok) {
-          const url = `https://reels.kevinhaus.com/?id=${data.id}`
+          const url = `https://kevinhaus.com/reel.html?id=${data.id}`
           if (reelSaveStatus) {
             reelSaveStatus.textContent = '✓ Saved'
             reelSaveStatus.style.color = 'green'
