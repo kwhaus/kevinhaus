@@ -794,6 +794,51 @@ body {
   accent-color: var(--kh-accent);
 }
 
+// Admin tabs
+.kh-admin-tab {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 0.5rem 1.25rem;
+  font-family: inherit;
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--kh-text-muted);
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+
+  &:hover { color: var(--kh-text); }
+
+  &--active {
+    color: var(--kh-text);
+    border-bottom-color: var(--kh-text);
+  }
+}
+
+// Reel picker items
+.kh-reel-pick-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.5rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background 0.12s;
+
+  &:hover { background: rgba(128,128,128,0.08); }
+
+  .pick-title { flex: 1; }
+  .pick-type  { font-size: 0.65rem; color: var(--kh-text-muted); text-transform: uppercase; }
+  .pick-action {
+    font-size: 0.9rem;
+    color: var(--kh-text-muted);
+    line-height: 1;
+    flex-shrink: 0;
+  }
+}
+
 // ── RESPONSIVE ────────────────────────────────────────────────────────────────
 // Mobile-first. Base styles above target all sizes.
 // Breakpoints: 390px (phone), 480px (large phone), 768px (tablet), 1024px (desktop)

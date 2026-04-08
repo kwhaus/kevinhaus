@@ -252,5 +252,70 @@
       "deny08.jpg"
     ],
     "showInPortfolio": true
+  },
+  {
+    "id": 14,
+    "title": "Reel - Comedy",
+    "artist": "Kevin Haus",
+    "song": "",
+    "type": "reel",
+    "assetId": "9VZUAuJIOTrfGL4z00Lrqfnb4GSCWfgi02sA8W1hZe5s8",
+    "playbackId": "E8BtqzaXAVTVqj7ck02018kcOaYJDco8398KL00C3BdfwI",
+    "coverImage": "cover_ReelComedy.jpg",
+    "aspectRatio": "16:9",
+    "stills": [],
+    "showInPortfolio": false
+  },
+  {
+    "id": 15,
+    "title": "Reel - Kids",
+    "artist": "Kevin Haus",
+    "song": "",
+    "type": "reel",
+    "assetId": "QIGXGL3NFFrj42RTsOHxyikLBLedNYExh7eQkebhUkk",
+    "playbackId": "8G2kS3I00T1u01iwHbwvnhHL9pQ1qRfbtR00EFLn02ht2jE",
+    "coverImage": "cover_ReelKids.jpg",
+    "aspectRatio": "16:9",
+    "stills": [],
+    "showInPortfolio": false
+  },
+  {
+    "id": 16,
+    "title": "Reel - Lifestyle",
+    "artist": "Kevin Haus",
+    "song": "",
+    "type": "reel",
+    "assetId": "Tpgv7O6jj5AiaGSzE46009JV33II96FrGa02xACN01B4ww",
+    "playbackId": "6SgufRt0100NevTMs1S2ty9BPB00zKWDt6kZMwsRXIpgCw",
+    "coverImage": "cover_ReelLifestyle.jpg",
+    "aspectRatio": "16:9",
+    "stills": [],
+    "showInPortfolio": false
+  },
+  {
+    "id": 17,
+    "title": "Metavivor x AnaOno",
+    "artist": "Metavivor",
+    "song": "AnaOno",
+    "type": "branded content",
+    "assetId": "it9Iazq1JLCjxewbQRItZ02vSOkPp8ANqibWLK1WrQi8",
+    "playbackId": "MooQH8e3wl8XkXVOoMV2WkH02eIr83DXAaFOlBcucq5M",
+    "coverImage": "cover_anaono.jpg",
+    "aspectRatio": "16:9",
+    "stills": [],
+    "showInPortfolio": false
+  },
+  {
+    "id": 18,
+    "title": "Not Just One - A Metastatic Breast Cancer Documentary",
+    "artist": "Allergan",
+    "song": "",
+    "type": "branded content",
+    "assetId": "01CCJ02z7IIMrXNw9qdPJAcnC00bXG02GVVvj1znAkMiMpw",
+    "playbackId": "lKBl2y9jERduqnFo02nNRSMfpSWYJJUnCFMXwu8xjoVo",
+    "coverImage": "cover_notjustone.jpg",
+    "aspectRatio": "16:9",
+    "stills": [],
+    "showInPortfolio": false
   }
 ]

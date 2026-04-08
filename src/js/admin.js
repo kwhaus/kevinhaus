@@ -216,10 +216,201 @@ document.addEventListener('DOMContentLoaded', async () => {
   })
 
   // ── SAVE BUTTON ──────────────────────────────────────────────────────────────
-  // Replaces old "Download JSON" with live save to Netlify Blobs
   if (saveBtn) {
     saveBtn.textContent = 'Save to Live Site'
     saveBtn.addEventListener('click', saveVideos)
   }
+
+  // ── REELS TAB ─────────────────────────────────────────────────────────────────
+  const reelsList       = document.getElementById('reelsList')
+  const reelAvailable   = document.getElementById('reelAvailable')
+  const reelContents    = document.getElementById('reelContents')
+  const reelClientInput = document.getElementById('reelClientName')
+  const reelIdInput     = document.getElementById('reelId')
+  const reelIdPreview   = document.getElementById('reelIdPreview')
+  const saveReelBtn     = document.getElementById('saveReelBtn')
+  const reelSaveStatus  = document.getElementById('reelSaveStatus')
+  const reelUrlWrap     = document.getElementById('reelUrlWrap')
+  const reelUrlLink     = document.getElementById('reelUrlLink')
+  const reelUrlCopy     = document.getElementById('reelUrlCopy')
+
+  let reelVideoList = [] // videos currently added to the reel being built
+
+  // Auto-generate slug from client name
+  if (reelClientInput && reelIdInput) {
+    reelClientInput.addEventListener('input', () => {
+      const slug = reelClientInput.value
+        .toLowerCase().trim()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, '')
+      reelIdInput.value = slug
+      if (reelIdPreview) reelIdPreview.textContent = slug || '...'
+    })
+
+    reelIdInput.addEventListener('input', () => {
+      if (reelIdPreview) reelIdPreview.textContent = reelIdInput.value || '...'
+    })
+  }
+
+  // Load existing reels
+  async function loadReels() {
+    if (!reelsList) return
+    try {
+      const res   = await fetch('/.netlify/functions/save-reel')
+      const reels = await res.json()
+
+      if (!reels.length) {
+        reelsList.innerHTML = '<div style="opacity:0.4; font-size:0.85rem; padding:0.5rem 0;">No reels yet.</div>'
+        return
+      }
+
+      reelsList.innerHTML = ''
+      reels.forEach(reel => {
+        const url  = `https://reels.kevinhaus.com/?id=${reel.id}`
+        const row  = document.createElement('div')
+        row.style.cssText = 'display:flex; align-items:center; gap:1rem; padding:0.5rem 0; border-bottom:1px solid var(--kh-border); font-size:0.85rem;'
+        row.innerHTML = `
+          <span style="flex:1;"><strong>${reel.clientName || reel.id}</strong></span>
+          <span style="color:var(--kh-text-muted); font-size:0.75rem;">${reel.videos?.length || 0} videos</span>
+          <a href="${url}" target="_blank" style="color:var(--kh-accent); font-size:0.75rem;">${url}</a>
+          <button class="btn btn-sm btn-link p-0 text-danger reel-delete-btn" data-id="${reel.id}"
+            style="font-size:0.9rem; text-decoration:none;">×</button>
+        `
+        row.querySelector('.reel-delete-btn').addEventListener('click', async e => {
+          const id = e.currentTarget.dataset.id
+          if (!confirm(`Delete reel "${id}"?`)) return
+          await fetch(`/.netlify/functions/save-reel?id=${id}`, {
+            method: 'DELETE',
+            headers: { 'X-Admin-Password': adminPassword },
+          })
+          loadReels()
+        })
+        reelsList.appendChild(row)
+      })
+    } catch {
+      reelsList.innerHTML = '<div style="color:var(--kh-accent); font-size:0.85rem;">Failed to load reels.</div>'
+    }
+  }
+
+  // Build available videos picker
+  function buildReelPicker() {
+    if (!reelAvailable) return
+    reelAvailable.innerHTML = ''
+    videoList.forEach(video => {
+      const item = document.createElement('div')
+      item.className = 'kh-reel-pick-item'
+      item.innerHTML = `
+        <span class="pick-title">${video.title}</span>
+        <span class="pick-type">${video.type}</span>
+        <span class="pick-action">+</span>
+      `
+      item.addEventListener('click', () => addToReel(video))
+      reelAvailable.appendChild(item)
+    })
+  }
+
+  // Add video to reel contents
+  function addToReel(video) {
+    if (reelVideoList.find(v => v.id === video.id)) return // already added
+    reelVideoList.push(video)
+    renderReelContents()
+  }
+
+  // Render reel contents list
+  function renderReelContents() {
+    if (!reelContents) return
+    reelContents.innerHTML = ''
+    reelVideoList.forEach((video, index) => {
+      const item = document.createElement('div')
+      item.className = 'kh-reel-pick-item'
+      item.draggable = true
+      item.dataset.index = index
+      item.innerHTML = `
+        <span style="color:var(--kh-text-muted); font-size:0.7rem; flex-shrink:0;">⠿</span>
+        <span class="pick-title">${video.title}</span>
+        <span class="pick-type">${video.type}</span>
+        <span class="pick-action reel-remove" data-index="${index}" style="cursor:pointer;">×</span>
+      `
+      item.querySelector('.reel-remove').addEventListener('click', e => {
+        const i = parseInt(e.currentTarget.dataset.index)
+        reelVideoList.splice(i, 1)
+        renderReelContents()
+      })
+
+      // Drag to reorder within reel
+      let dragFrom = null
+      item.addEventListener('dragstart', () => { dragFrom = index })
+      item.addEventListener('dragover',  e => e.preventDefault())
+      item.addEventListener('drop', () => {
+        if (dragFrom === null || dragFrom === index) return
+        const moved = reelVideoList.splice(dragFrom, 1)[0]
+        reelVideoList.splice(index, 0, moved)
+        dragFrom = null
+        renderReelContents()
+      })
+
+      reelContents.appendChild(item)
+    })
+  }
+
+  // Save reel
+  if (saveReelBtn) {
+    saveReelBtn.addEventListener('click', async () => {
+      const id         = reelIdInput?.value.trim()
+      const clientName = reelClientInput?.value.trim()
+
+      if (!id) { alert('Please enter a URL slug.'); return }
+      if (!reelVideoList.length) { alert('Please add at least one video.'); return }
+
+      if (reelSaveStatus) {
+        reelSaveStatus.textContent = 'Saving...'
+        reelSaveStatus.style.color = 'var(--kh-text-muted)'
+      }
+
+      try {
+        const res = await fetch('/.netlify/functions/save-reel', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Admin-Password': adminPassword,
+          },
+          body: JSON.stringify({ id, clientName, videos: reelVideoList }),
+        })
+
+        const data = await res.json()
+
+        if (res.ok) {
+          const url = `https://reels.kevinhaus.com/?id=${data.id}`
+          if (reelSaveStatus) {
+            reelSaveStatus.textContent = '✓ Saved'
+            reelSaveStatus.style.color = 'green'
+          }
+          if (reelUrlWrap) reelUrlWrap.style.display = ''
+          if (reelUrlLink) { reelUrlLink.href = url; reelUrlLink.textContent = url }
+          loadReels()
+        } else {
+          throw new Error(data.error || 'Save failed')
+        }
+      } catch (err) {
+        if (reelSaveStatus) {
+          reelSaveStatus.textContent = '✗ Failed'
+          reelSaveStatus.style.color = 'red'
+        }
+      }
+    })
+  }
+
+  // Copy URL button
+  if (reelUrlCopy) {
+    reelUrlCopy.addEventListener('click', () => {
+      if (reelUrlLink) navigator.clipboard.writeText(reelUrlLink.href)
+      reelUrlCopy.textContent = 'Copied!'
+      setTimeout(() => { reelUrlCopy.textContent = 'Copy' }, 2000)
+    })
+  }
+
+  // Load reels when panel loads
+  loadReels()
+  buildReelPicker()
 
 })

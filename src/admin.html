@@ -9,6 +9,14 @@
   <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png">
   <script type="module" src="./js/main.js"></script>
   <script type="module" src="./js/admin.js"></script>
+  <script>
+    function switchTab(tab) {
+      document.getElementById('panelVideos').style.display = tab === 'videos' ? '' : 'none'
+      document.getElementById('panelReels').style.display  = tab === 'reels'  ? '' : 'none'
+      document.getElementById('tabVideos').classList.toggle('kh-admin-tab--active', tab === 'videos')
+      document.getElementById('tabReels').classList.toggle('kh-admin-tab--active',  tab === 'reels')
+    }
+  </script>
 </head>
 <body>
 
@@ -39,69 +47,149 @@
       <!-- Admin panel (hidden until logged in) -->
       <div id="adminPanel" style="display:none;">
 
-        <div class="kh-admin-header">
-          <span>Video List — drag to reorder</span>
-          <span style="font-size:0.7rem; color:var(--kh-text-muted);">Changes download as videos.json — replace the file in src/ then rebuild</span>
+        <!-- Tabs -->
+        <div style="display:flex; gap:0; border-bottom: 1px solid var(--kh-border); margin-bottom: 1.5rem;">
+          <button id="tabVideos" class="kh-admin-tab kh-admin-tab--active" onclick="switchTab('videos')">Videos</button>
+          <button id="tabReels"  class="kh-admin-tab" onclick="switchTab('reels')">Reels</button>
         </div>
 
-        <!-- Video list -->
-        <div id="adminList">
-          <!-- Cards injected by admin.js -->
-        </div>
+        <!-- ── VIDEOS TAB ──────────────────────────────────────── -->
+        <div id="panelVideos">
 
-        <!-- Add video form -->
-        <div style="margin-top: 2rem; border-top: 1px solid var(--kh-border); padding-top: 1.5rem;">
-          <h2 style="font-size:0.8rem; letter-spacing:0.15em; text-transform:uppercase; margin-bottom:1.25rem; color:var(--kh-text-muted);">Add New Video</h2>
-          <div class="row g-2">
-            <div class="col-12 col-md-6">
-              <input type="text" id="newTitle" class="form-control form-control-sm" placeholder="Title (e.g. Nothing - Purple Strings)"
-                style="background:var(--kh-bg-secondary); border-color:var(--kh-border); color:var(--kh-text); font-family:inherit;">
-            </div>
-            <div class="col-12 col-md-3">
-              <select id="newType" class="form-select form-select-sm"
-                style="background:var(--kh-bg-secondary); border-color:var(--kh-border); color:var(--kh-text); font-family:inherit;">
-                <option value="music video">Music Video</option>
-                <option value="commercial">Commercial</option>
-                <option value="branded content">Branded Content</option>
-                <option value="short film">Short Film</option>
-              </select>
-            </div>
-            <div class="col-12 col-md-3">
-              <input type="text" id="newAspect" class="form-control form-control-sm" placeholder="Aspect ratio (16:9)"
-                style="background:var(--kh-bg-secondary); border-color:var(--kh-border); color:var(--kh-text); font-family:inherit;">
-            </div>
-            <div class="col-12 col-md-6">
-              <input type="text" id="newAssetId" class="form-control form-control-sm" placeholder="Mux Asset ID"
-                style="background:var(--kh-bg-secondary); border-color:var(--kh-border); color:var(--kh-text); font-family:inherit;">
-            </div>
-            <div class="col-12 col-md-6">
-              <input type="text" id="newPlaybackId" class="form-control form-control-sm" placeholder="Mux Playback ID"
-                style="background:var(--kh-bg-secondary); border-color:var(--kh-border); color:var(--kh-text); font-family:inherit;">
-            </div>
-            <div class="col-12">
-              <input type="text" id="newStills" class="form-control form-control-sm" placeholder="Still filenames, comma-separated (e.g. newvid01.jpg, newvid02.jpg)"
-                style="background:var(--kh-bg-secondary); border-color:var(--kh-border); color:var(--kh-text); font-family:inherit;">
-            </div>
-            <div class="col-12" style="display:flex; align-items:center; gap:0.5rem;">
-              <input type="checkbox" id="newPortfolio" checked style="cursor:pointer;">
-              <label for="newPortfolio" style="font-size:0.8rem; color:var(--kh-text-muted); cursor:pointer; margin:0;">
-                Show in portfolio (uncheck for reel-only videos)
-              </label>
-            </div>
-            <div class="col-12">
-              <button id="addVideoBtn" class="btn btn-sm btn-outline-secondary" style="font-family:inherit; letter-spacing:0.06em;">
-                + Add to List
-              </button>
+          <div class="kh-admin-header">
+            <span>Video List — drag to reorder</span>
+          </div>
+
+          <div id="adminList"></div>
+
+          <!-- Add video form -->
+          <div style="margin-top: 2rem; border-top: 1px solid var(--kh-border); padding-top: 1.5rem;">
+            <h2 style="font-size:0.8rem; letter-spacing:0.15em; text-transform:uppercase; margin-bottom:1.25rem; color:var(--kh-text-muted);">Add New Video</h2>
+            <div class="row g-2">
+              <div class="col-12 col-md-6">
+                <input type="text" id="newTitle" class="form-control form-control-sm" placeholder="Title (e.g. Nothing - Purple Strings)"
+                  style="background:var(--kh-bg-secondary); border-color:var(--kh-border); color:var(--kh-text); font-family:inherit;">
+              </div>
+              <div class="col-12 col-md-3">
+                <select id="newType" class="form-select form-select-sm"
+                  style="background:var(--kh-bg-secondary); border-color:var(--kh-border); color:var(--kh-text); font-family:inherit;">
+                  <option value="music video">Music Video</option>
+                  <option value="commercial">Commercial</option>
+                  <option value="branded content">Branded Content</option>
+                  <option value="short film">Short Film</option>
+                  <option value="reel">Reel</option>
+                </select>
+              </div>
+              <div class="col-12 col-md-3">
+                <input type="text" id="newAspect" class="form-control form-control-sm" placeholder="Aspect ratio (16:9)"
+                  style="background:var(--kh-bg-secondary); border-color:var(--kh-border); color:var(--kh-text); font-family:inherit;">
+              </div>
+              <div class="col-12 col-md-6">
+                <input type="text" id="newAssetId" class="form-control form-control-sm" placeholder="Mux Asset ID"
+                  style="background:var(--kh-bg-secondary); border-color:var(--kh-border); color:var(--kh-text); font-family:inherit;">
+              </div>
+              <div class="col-12 col-md-6">
+                <input type="text" id="newPlaybackId" class="form-control form-control-sm" placeholder="Mux Playback ID"
+                  style="background:var(--kh-bg-secondary); border-color:var(--kh-border); color:var(--kh-text); font-family:inherit;">
+              </div>
+              <div class="col-12">
+                <input type="text" id="newStills" class="form-control form-control-sm" placeholder="Still filenames, comma-separated"
+                  style="background:var(--kh-bg-secondary); border-color:var(--kh-border); color:var(--kh-text); font-family:inherit;">
+              </div>
+              <div class="col-12" style="display:flex; align-items:center; gap:0.5rem;">
+                <input type="checkbox" id="newPortfolio" checked style="cursor:pointer;">
+                <label for="newPortfolio" style="font-size:0.8rem; color:var(--kh-text-muted); cursor:pointer; margin:0;">
+                  Show in portfolio (uncheck for reel-only)
+                </label>
+              </div>
+              <div class="col-12">
+                <button id="addVideoBtn" class="btn btn-sm btn-outline-secondary" style="font-family:inherit; letter-spacing:0.06em;">
+                  + Add to List
+                </button>
+              </div>
             </div>
           </div>
+
+          <!-- Save videos button -->
+          <div style="margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid var(--kh-border); display:flex; gap:1rem; align-items:center;">
+            <button id="downloadJson" class="btn btn-outline-secondary" style="font-family:inherit; letter-spacing:0.08em;">
+              ↑ Save to Live Site
+            </button>
+            <span id="saveStatus" style="font-size:0.85rem;"></span>
+          </div>
+
         </div>
 
-        <!-- Save button -->
-        <div style="margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid var(--kh-border); display:flex; gap:1rem; align-items:center;">
-          <button id="downloadJson" class="btn btn-outline-secondary" style="font-family:inherit; letter-spacing:0.08em;">
-            ↑ Save to Live Site
-          </button>
-          <span id="saveStatus" style="font-size:0.85rem;"></span>
+        <!-- ── REELS TAB ───────────────────────────────────────── -->
+        <div id="panelReels" style="display:none;">
+
+          <!-- Existing reels list -->
+          <div class="kh-admin-header">
+            <span>Your Reels</span>
+          </div>
+          <div id="reelsList" style="margin-bottom:2rem;">
+            <div style="opacity:0.4; font-size:0.85rem; padding:0.5rem 0;">Loading reels...</div>
+          </div>
+
+          <!-- Create new reel -->
+          <div style="border-top: 1px solid var(--kh-border); padding-top: 1.5rem;">
+            <h2 style="font-size:0.8rem; letter-spacing:0.15em; text-transform:uppercase; margin-bottom:1.25rem; color:var(--kh-text-muted);">Create New Reel</h2>
+
+            <div class="row g-2" style="margin-bottom:1rem;">
+              <div class="col-12 col-md-5">
+                <input type="text" id="reelClientName" class="form-control form-control-sm" placeholder="Client name (e.g. Warner Music)"
+                  style="background:var(--kh-bg-secondary); border-color:var(--kh-border); color:var(--kh-text); font-family:inherit;">
+              </div>
+              <div class="col-12 col-md-5">
+                <input type="text" id="reelId" class="form-control form-control-sm" placeholder="URL slug (e.g. warner-music-2025)"
+                  style="background:var(--kh-bg-secondary); border-color:var(--kh-border); color:var(--kh-text); font-family:inherit;">
+              </div>
+              <div class="col-12 col-md-2">
+                <div style="font-size:0.7rem; color:var(--kh-text-muted); padding-top:0.4rem;">
+                  reels.kevinhaus.com/?id=<span id="reelIdPreview" style="color:var(--kh-text);">...</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Video picker — drag from available into reel -->
+            <div style="display:flex; gap:1.5rem; margin-top:1rem;">
+
+              <!-- Available videos -->
+              <div style="flex:1; min-width:0;">
+                <div style="font-size:0.75rem; color:var(--kh-text-muted); letter-spacing:0.08em; text-transform:uppercase; margin-bottom:0.5rem;">
+                  All Videos — click to add
+                </div>
+                <div id="reelAvailable" style="max-height:320px; overflow-y:auto; border:1px solid var(--kh-border); padding:0.5rem; display:flex; flex-direction:column; gap:0.25rem;">
+                </div>
+              </div>
+
+              <!-- Reel contents -->
+              <div style="flex:1; min-width:0;">
+                <div style="font-size:0.75rem; color:var(--kh-text-muted); letter-spacing:0.08em; text-transform:uppercase; margin-bottom:0.5rem;">
+                  In This Reel — drag to reorder, click × to remove
+                </div>
+                <div id="reelContents" style="max-height:320px; overflow-y:auto; border:1px solid var(--kh-border); padding:0.5rem; display:flex; flex-direction:column; gap:0.25rem; min-height:80px;">
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Save reel -->
+            <div style="margin-top:1.5rem; display:flex; gap:1rem; align-items:center;">
+              <button id="saveReelBtn" class="btn btn-outline-secondary" style="font-family:inherit; letter-spacing:0.08em;">
+                ↑ Save Reel
+              </button>
+              <span id="reelSaveStatus" style="font-size:0.85rem;"></span>
+            </div>
+
+            <!-- Generated URL -->
+            <div id="reelUrlWrap" style="display:none; margin-top:1rem; padding:0.75rem; background:var(--kh-bg-secondary); border:1px solid var(--kh-border); font-size:0.85rem;">
+              <span style="color:var(--kh-text-muted);">Share this link: </span>
+              <a id="reelUrlLink" href="#" target="_blank" style="color:var(--kh-accent);"></a>
+              <button id="reelUrlCopy" class="btn btn-sm btn-link p-0 ms-2" style="font-size:0.8rem; font-family:inherit;">Copy</button>
+            </div>
+          </div>
+
         </div>
 
       </div>
