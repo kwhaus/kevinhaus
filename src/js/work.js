@@ -122,13 +122,14 @@ async function init() {
 
     const res  = await fetch('/.netlify/functions/get-videos')
     const data = await res.json()
-    videos = Array.isArray(data) ? data : []
+    const all  = Array.isArray(data) ? data : []
 
-    // If Blobs is empty on first run, fall back to bundled JSON
-    if (videos.length === 0) {
-      const fallback = await import('../videos.json')
-      videos = fallback.default || []
-    }
+    // Fall back to bundled JSON if Blobs is empty
+    const source = all.length > 0 ? all : (await import('../videos.json')).default || []
+
+    // Work page only shows portfolio videos
+    // Videos without showInPortfolio field default to true (backward compat)
+    videos = source.filter(v => v.showInPortfolio !== false)
 
     buildPlaylist()
     preloadAllCovers(videos)
@@ -145,10 +146,10 @@ async function init() {
 
   } catch (err) {
     console.error('work.js init error:', err)
-    // Fall back to bundled JSON on any error
     try {
       const fallback = await import('../videos.json')
-      videos = fallback.default || []
+      const all = fallback.default || []
+      videos = all.filter(v => v.showInPortfolio !== false)
       buildPlaylist()
       preloadAllCovers(videos)
       if (videos.length > 0) loadVideo(videos[0].id)

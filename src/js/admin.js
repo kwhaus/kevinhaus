@@ -104,12 +104,22 @@ document.addEventListener('DOMContentLoaded', async () => {
         <span class="kh-admin-num">${String(index + 1).padStart(2, '0')}</span>
         <span class="kh-admin-title">${video.title}</span>
         <span class="kh-admin-type">${video.type}</span>
+        <label class="kh-admin-toggle" title="Show in portfolio">
+          <input type="checkbox" class="portfolio-toggle" data-index="${index}"
+            ${video.showInPortfolio !== false ? 'checked' : ''}>
+          <span class="kh-admin-toggle-label">Portfolio</span>
+        </label>
         <button class="btn btn-sm btn-link p-0 ms-2 text-danger delete-btn"
           data-index="${index}"
           title="Remove from list"
           style="font-size:1rem; line-height:1; text-decoration:none;"
         >×</button>
       `
+
+      card.querySelector('.portfolio-toggle').addEventListener('change', e => {
+        const i = parseInt(e.currentTarget.dataset.index)
+        videoList[i].showInPortfolio = e.currentTarget.checked
+      })
 
       card.querySelector('.delete-btn').addEventListener('click', e => {
         e.stopPropagation()
@@ -173,6 +183,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const stillsRaw   = document.getElementById('newStills').value.trim()
     const coverEl     = document.getElementById('newCover')
     const coverImage  = coverEl ? coverEl.value.trim() : ''
+    const portfolioEl = document.getElementById('newPortfolio')
+    const showInPortfolio = portfolioEl ? portfolioEl.checked : true
 
     if (!title || !playbackId) {
       alert('Title and Playback ID are required.')
@@ -190,6 +202,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       title, artist, song, type,
       assetId, playbackId, coverImage,
       aspectRatio, stills,
+      showInPortfolio,
     })
 
     buildList()

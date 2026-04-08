@@ -111,7 +111,7 @@ body {
 .kh-navbar {
   background-color: var(--kh-nav-bg);
   backdrop-filter: blur(8px);
-  border-bottom: 0px solid var(--kh-border); //was 1px
+  border-bottom: 1px solid var(--kh-border);
   padding: 0.75rem 1.25rem;
   position: fixed;
   top: 0;
@@ -271,7 +271,7 @@ body {
 .kh-footer {
   margin-top: auto;
   padding: 2rem 1.25rem 1.5rem;
-  border-top: 0px solid var(--kh-border); //was 1px
+  border-top: 1px solid var(--kh-border);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -513,7 +513,7 @@ body {
 
 .kh-social-link {
   display: block;
-  color: var(--kh-text);
+  color: var(--kh-text-muted);
   transition: color 0.2s;
 
   &:hover { color: var(--kh-text); }
@@ -769,6 +769,29 @@ body {
   color: var(--kh-border);
   font-size: 1.1rem;
   flex-shrink: 0;
+}
+
+// Portfolio toggle on admin cards
+.kh-admin-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  cursor: pointer;
+  flex-shrink: 0;
+  margin: 0;
+}
+
+.kh-admin-toggle-label {
+  font-size: 0.7rem;
+  color: var(--kh-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+.kh-admin-toggle input[type="checkbox"] {
+  cursor: pointer;
+  accent-color: var(--kh-accent);
 }
 
 // ── RESPONSIVE ────────────────────────────────────────────────────────────────

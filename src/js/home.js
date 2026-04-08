@@ -48,8 +48,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // ── BUILD STILL POOL ───────────────────────────────────────────────────────
+  // Only use stills from portfolio videos on the home page
+  const portfolioVideos = videoData.filter(v => v.showInPortfolio !== false)
   const stillPool = []
-  videoData.forEach(video => {
+  portfolioVideos.forEach(video => {
     if (video.stills && video.stills.length > 0) {
       video.stills.forEach(filename => {
         stillPool.push({
