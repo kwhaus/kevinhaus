@@ -12,3 +12,14 @@
   to     = "https://www.kevinhaus.com/:splat"
   status = 301
   force  = true
+
+# Old site URLs — redirect to work page
+[[redirects]]
+  from   = "/work/zeroday.html"
+  to     = "/work.html"
+  status = 301
+
+[[redirects]]
+  from   = "/work/www.kevinhaus.com/*"
+  to     = "/work.html"
+  status = 301
