@@ -1,6 +1,7 @@
 import { resolve, dirname } from 'path'
 import { fileURLToPath } from 'url'
 import { defineConfig } from 'vite'
+import purgecss from 'vite-plugin-purgecss'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
@@ -9,6 +10,37 @@ export default defineConfig({
 
   root: resolve(__dirname, 'src'),
   publicDir: resolve(__dirname, 'public'),
+
+  plugins: [
+    purgecss({
+      content: [
+        resolve(__dirname, 'src/**/*.html'),
+        resolve(__dirname, 'src/**/*.js'),
+      ],
+      // Safelist patterns — never purge these even if not found in static scan
+      safelist: {
+        standard: [
+          // Bootstrap JS-driven classes
+          /^show$/,
+          /^collaps/,
+          /^offcanvas/,
+          /^modal/,
+          /^dropdown/,
+          /^fade$/,
+          /^active$/,
+          // Theme switching
+          /^data-bs-theme/,
+        ],
+        deep: [
+          // Dynamic classes added by JS
+          /dragging/,
+          /drag-over/,
+          /fading/,
+          /kh-preloader/,
+        ],
+      },
+    }),
+  ],
 
   build: {
     outDir: resolve(__dirname, 'dist'),
