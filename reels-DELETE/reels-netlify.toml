@@ -1,6 +1,0 @@
-[build]
-  publish = "."
-  # No build command — reels is plain HTML/JS, no compilation needed
-
-[build.environment]
-  NODE_VERSION = "22"

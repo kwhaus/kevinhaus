@@ -141,3 +141,8 @@ vite.config.ts.timestamp-*
 # Other
 .DS_Store
 src.zip
+.DS_Store
+public/.DS_Store
+public/assets/.DS_Store
+assets/Stills/
+assets/Covers/
