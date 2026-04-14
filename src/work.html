@@ -17,7 +17,7 @@
   <!-- Preload first video cover so it appears before JS runs -->
   <link rel="preload" as="image" href="/assets/Covers/cover_PurpleStrings.webp" fetchpriority="high">
   <!-- VideoObject structured data injected by work.js -->
-  <script src="https://cdn.jsdelivr.net/npm/@mux/mux-player" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mux/mux-player@3.11.7" defer></script>
   <script type="module" src="./js/main.js"></script>
   <script type="module" src="./js/work.js"></script>
 </head>
@@ -31,7 +31,9 @@
       data-logo-dark="/assets/KH_Square_wht.png"
       data-logo-swap
       alt=""
-    >
+          width="48"
+          height="48"
+        >
   </div>
 
 
@@ -43,6 +45,9 @@
 
       <!-- Video player -->
       <div class="kh-player-wrap" id="playerWrap" data-ratio="4:3">
+        <!-- Cover overlay — shows the still image while mux-player initialises.
+             Fades out once the player is ready, eliminating the resize/flash. -->
+        <div class="kh-player-cover" id="playerCover" aria-hidden="true"></div>
         <mux-player
           id="mainPlayer"
           playback-id=""
@@ -68,6 +73,8 @@
           data-logo-dark="/assets/KH_Square_wht.png"
           data-logo-swap
           alt="KH"
+          width="48"
+          height="48"
         >
       </div>
       <a href="mailto:hello@kevinhaus.com" class="kh-footer-email">

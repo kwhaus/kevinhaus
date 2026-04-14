@@ -61,9 +61,10 @@ function injectVideoSchema(videos) {
 }
 
 // ── DOM REFS ──────────────────────────────────────────────────────────────────
-const player     = document.getElementById('mainPlayer')
-const playerWrap = document.getElementById('playerWrap')
-const playlist   = document.getElementById('playlist')
+const player      = document.getElementById('mainPlayer')
+const playerWrap  = document.getElementById('playerWrap')
+const playerCover = document.getElementById('playerCover')
+const playlist    = document.getElementById('playlist')
 
 // ── STATE ─────────────────────────────────────────────────────────────────────
 let activeId = null
@@ -77,11 +78,28 @@ function loadVideo(id) {
   activeId = id
 
   const posterUrl = getPosterUrl(video)
+
+  // Reserve space at the correct aspect ratio and show the cover image
+  // immediately, before mux-player has initialised. This eliminates the
+  // resize flash and empty-player chrome on every video load.
+  playerWrap.dataset.ratio = video.aspectRatio
+  if (playerCover) {
+    playerCover.style.backgroundImage = `url('${posterUrl}')`
+    playerCover.classList.remove('kh-player-cover--hidden')
+  }
+
   player.setAttribute('poster', posterUrl)
   player.setAttribute('playback-id', video.playbackId)
   player.setAttribute('metadata-video-title', video.title)
 
-  playerWrap.dataset.ratio = video.aspectRatio
+  // Fade the cover out once the player has loaded enough to show its poster.
+  // Fallback timeout ensures it always clears even if the event misfires.
+  const revealPlayer = () => {
+    if (playerCover) playerCover.classList.add('kh-player-cover--hidden')
+  }
+  player.addEventListener('loadedmetadata', revealPlayer, { once: true })
+  setTimeout(revealPlayer, 2000)
+
   window.scrollTo({ top: 0, behavior: 'smooth' })
 
   document.querySelectorAll('.kh-playlist-link').forEach(btn => {

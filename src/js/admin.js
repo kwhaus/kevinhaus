@@ -68,6 +68,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       videoList = videosData.map(v => ({ ...v }))
     }
     buildList()
+    buildReelPicker()
   }
 
   // ── SAVE VIDEOS TO BLOBS ─────────────────────────────────────────────────────
@@ -427,6 +428,5 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Load reels when panel loads
   loadReels()
-  buildReelPicker()
 
 })

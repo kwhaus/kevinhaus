@@ -256,7 +256,8 @@ body {
   margin-top: auto;
   padding-top: 2rem;
   font-size: 0.8rem;
-  color: var(--kh-text-muted);
+  color: var(--kh-text);
+  // color: var(--kh-text-muted);
 }
 
 // ── PAGE WRAPPER ──────────────────────────────────────────────────────────────
@@ -300,7 +301,7 @@ body {
 
 // ── NAV EMAIL IMAGE ───────────────────────────────────────────────────────────
 .kh-nav-email-img {
-  height: 16px;
+  height: 48px;
   width: auto;
   display: block;
   opacity: 0.6;
@@ -373,6 +374,7 @@ body {
 }
 
 .kh-player-wrap {
+  position: relative;
   width: 100%;
   margin-bottom: 2.5rem;
 
@@ -385,6 +387,30 @@ body {
   &[data-ratio="4:3"] mux-player  { aspect-ratio: 4/3; }
   &[data-ratio="12:5"] mux-player { aspect-ratio: 12/5; }
   &[data-ratio="16:9"] mux-player { aspect-ratio: 16/9; }
+
+  // Cover overlay — sits on top of mux-player while it initialises.
+  // Matches the player's aspect ratio so no reflow occurs.
+  // Fades out once the player fires its ready event.
+  &[data-ratio="4:3"]  .kh-player-cover { aspect-ratio: 4/3; }
+  &[data-ratio="12:5"] .kh-player-cover { aspect-ratio: 12/5; }
+  &[data-ratio="16:9"] .kh-player-cover { aspect-ratio: 16/9; }
+}
+
+.kh-player-cover {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  background-size: cover;
+  background-position: center;
+  background-color: var(--kh-bg-secondary);
+  z-index: 2;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+
+  &.kh-player-cover--hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
 }
 
 // Video playlist
@@ -513,7 +539,8 @@ body {
 
 .kh-social-link {
   display: block;
-  color: var(--kh-text-muted);
+  color: var(--kh-text);
+  // color: var(--kh-text-muted);
   transition: color 0.2s;
 
   &:hover { color: var(--kh-text); }
