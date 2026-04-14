@@ -46,7 +46,23 @@ document.addEventListener('DOMContentLoaded', async () => {
       listEl.innerHTML = '<div style="opacity:0.4; padding:1rem 0;">Loading...</div>'
       const res  = await fetch('/.netlify/functions/get-videos')
       const data = await res.json()
-      videoList  = Array.isArray(data) && data.length > 0 ? data : videosData.map(v => ({ ...v }))
+
+      if (Array.isArray(data) && data.length > 0) {
+        // Merge: use Blobs for ordering/showInPortfolio, but take stills +
+        // coverImage from bundled JSON so .webp filenames are always current.
+        const bundledMap = new Map(videosData.map(v => [v.id, v]))
+        videoList = data.map(blobVideo => {
+          const bundled = bundledMap.get(blobVideo.id)
+          if (!bundled) return blobVideo
+          return {
+            ...blobVideo,
+            stills:      bundled.stills,
+            coverImage:  bundled.coverImage,
+          }
+        })
+      } else {
+        videoList = videosData.map(v => ({ ...v }))
+      }
     } catch {
       // Fall back to bundled JSON
       videoList = videosData.map(v => ({ ...v }))
