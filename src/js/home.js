@@ -173,6 +173,17 @@ document.addEventListener('DOMContentLoaded', async () => {
   })
 
   // ── START ──────────────────────────────────────────────────────────────────
-  startCycle()
+  // Show the first still, then signal main.js once it has actually loaded
+  // so the preloader isn't dismissed before the image is visible.
+  showStill(currentIndex)
+  cycleTimer = setInterval(() => goTo(1), config.stillHoldTime)
+
+  const signalReady = () => document.dispatchEvent(new CustomEvent('kh:first-still-loaded'))
+  if (stillImg.complete && stillImg.naturalWidth > 0) {
+    signalReady()
+  } else {
+    stillImg.addEventListener('load',  signalReady, { once: true })
+    stillImg.addEventListener('error', signalReady, { once: true }) // fail-safe
+  }
 
 })

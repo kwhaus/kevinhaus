@@ -82,7 +82,7 @@ function loadVideo(id) {
   player.setAttribute('metadata-video-title', video.title)
 
   playerWrap.dataset.ratio = video.aspectRatio
-  playerWrap.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  window.scrollTo({ top: 0, behavior: 'smooth' })
 
   document.querySelectorAll('.kh-playlist-link').forEach(btn => {
     const isActive = parseInt(btn.dataset.id) === id

@@ -41,15 +41,27 @@ document.addEventListener('DOMContentLoaded', () => {
   // Apply saved or default theme immediately
   applyTheme(getTheme())
 
-  // Dismiss preloader once page is ready
+  // Dismiss preloader once page is ready.
+  // On the home page, wait for the first still image to load before dismissing
+  // so the wordmark and image are visible together. On other pages, a short
+  // delay is enough since there's no async image fetch to wait for.
   const preloader = document.getElementById('khPreloader')
   if (preloader) {
-    // Small delay so the first paint is complete before fading out
-    setTimeout(() => {
+    const dismiss = () => {
       preloader.classList.add('kh-preloader--hidden')
-      // Remove from DOM after fade completes so it doesn't block interaction
       preloader.addEventListener('transitionend', () => preloader.remove(), { once: true })
-    }, 300)
+    }
+
+    const isHome = document.body.dataset.page === 'home'
+    if (isHome) {
+      // home.js fires this event once the first still has loaded
+      document.addEventListener('kh:first-still-loaded', dismiss, { once: true })
+      // Hard cap: dismiss after 4s regardless, so a slow connection never
+      // leaves the preloader up forever
+      setTimeout(dismiss, 4000)
+    } else {
+      setTimeout(dismiss, 300)
+    }
   }
 
   // Theme toggle button
