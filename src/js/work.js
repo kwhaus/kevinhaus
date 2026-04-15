@@ -79,21 +79,23 @@ function loadVideo(id) {
 
   const posterUrl = getPosterUrl(video)
 
-  // Reserve space at the correct aspect ratio and show the cover image
-  // immediately, before mux-player has initialised. This eliminates the
-  // resize flash and empty-player chrome on every video load.
+  // 1. Set ratio on the wrap first — this locks the layout size immediately
+  //    so the page doesn't reflow when mux-player initialises inside it.
   playerWrap.dataset.ratio = video.aspectRatio
+
+  // 2. Show cover image instantly — hides mux-player chrome while it boots.
   if (playerCover) {
     playerCover.style.backgroundImage = `url('${posterUrl}')`
     playerCover.classList.remove('kh-player-cover--hidden')
   }
 
+  // 3. Set player attributes — mux-player loads behind the cover.
   player.setAttribute('poster', posterUrl)
   player.setAttribute('playback-id', video.playbackId)
   player.setAttribute('metadata-video-title', video.title)
 
-  // Fade the cover out once the player has loaded enough to show its poster.
-  // Fallback timeout ensures it always clears even if the event misfires.
+  // 4. Fade cover out once mux-player has its poster ready.
+  //    Fallback timeout ensures it always clears even if the event misfires.
   const revealPlayer = () => {
     if (playerCover) playerCover.classList.add('kh-player-cover--hidden')
   }

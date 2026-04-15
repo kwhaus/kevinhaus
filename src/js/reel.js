@@ -60,11 +60,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     messageEl.style.display = 'none'
     layout.style.display = ''
 
-    // Load first video
-    loadVideo(reel.videos, 0)
-
-    // Build playlist
+    // Build playlist first so active state can be set when player loads
     buildPlaylist(reel.videos)
+
+    // Wait for mux-player to be registered before setting attributes —
+    // both this module and the mux-player CDN script are deferred, and
+    // the execution order isn't guaranteed, so calling setAttribute on
+    // an unregistered custom element silently does nothing.
+    await customElements.whenDefined('mux-player')
+    loadVideo(reel.videos, 0)
 
     // Fire view notification (silent — doesn't affect viewer)
     notifyView(reelId, reel.clientName)

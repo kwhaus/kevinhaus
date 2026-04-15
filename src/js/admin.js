@@ -60,6 +60,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             coverImage:  bundled.coverImage,
           }
         })
+        // Append any bundled videos missing from Blobs entirely —
+        // happens when new videos are added to videos.json but Blobs
+        // hasn't been saved since (e.g. IDs 15-18 after a partial save).
+        const blobIds = new Set(data.map(v => v.id))
+        videosData.forEach(v => {
+          if (!blobIds.has(v.id)) videoList.push({ ...v })
+        })
       } else {
         videoList = videosData.map(v => ({ ...v }))
       }
@@ -337,6 +344,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   function renderReelContents() {
     if (!reelContents) return
     reelContents.innerHTML = ''
+
+    // dragFrom must be outside the loop so all items share the same reference —
+    // dragstart sets it on the dragged item, drop reads it on the target item.
+    let dragFrom = null
+
     reelVideoList.forEach((video, index) => {
       const item = document.createElement('div')
       item.className = 'kh-reel-pick-item'
@@ -354,8 +366,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderReelContents()
       })
 
-      // Drag to reorder within reel
-      let dragFrom = null
       item.addEventListener('dragstart', () => { dragFrom = index })
       item.addEventListener('dragover',  e => e.preventDefault())
       item.addEventListener('drop', () => {
