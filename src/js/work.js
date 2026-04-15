@@ -61,10 +61,9 @@ function injectVideoSchema(videos) {
 }
 
 // ── DOM REFS ──────────────────────────────────────────────────────────────────
-const player      = document.getElementById('mainPlayer')
-const playerWrap  = document.getElementById('playerWrap')
-const playerCover = document.getElementById('playerCover')
-const playlist    = document.getElementById('playlist')
+const player     = document.getElementById('mainPlayer')
+const playerWrap = document.getElementById('playerWrap')
+const playlist   = document.getElementById('playlist')
 
 // ── STATE ─────────────────────────────────────────────────────────────────────
 let activeId = null
@@ -78,30 +77,11 @@ function loadVideo(id) {
   activeId = id
 
   const posterUrl = getPosterUrl(video)
-
-  // 1. Set ratio on the wrap first — this locks the layout size immediately
-  //    so the page doesn't reflow when mux-player initialises inside it.
-  playerWrap.dataset.ratio = video.aspectRatio
-
-  // 2. Show cover image instantly — hides mux-player chrome while it boots.
-  if (playerCover) {
-    playerCover.style.backgroundImage = `url('${posterUrl}')`
-    playerCover.classList.remove('kh-player-cover--hidden')
-  }
-
-  // 3. Set player attributes — mux-player loads behind the cover.
   player.setAttribute('poster', posterUrl)
   player.setAttribute('playback-id', video.playbackId)
   player.setAttribute('metadata-video-title', video.title)
 
-  // 4. Fade cover out after mux-player has had time to resize and render
-  //    its poster. loadedmetadata fires before the player has finished
-  //    reflowing to its new aspect ratio, so a short fixed delay is more
-  //    reliable. 600ms covers the resize + poster render on any connection.
-  setTimeout(() => {
-    if (playerCover) playerCover.classList.add('kh-player-cover--hidden')
-  }, 600)
-
+  playerWrap.dataset.ratio = video.aspectRatio
   window.scrollTo({ top: 0, behavior: 'smooth' })
 
   document.querySelectorAll('.kh-playlist-link').forEach(btn => {

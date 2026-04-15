@@ -374,7 +374,6 @@ body {
 }
 
 .kh-player-wrap {
-  position: relative;
   width: 100%;
   margin-bottom: 2.5rem;
 
@@ -383,34 +382,9 @@ body {
     display: block;
   }
 
-  // Aspect ratio on mux-player directly — proven working approach.
   &[data-ratio="4:3"]  mux-player { aspect-ratio: 4/3; }
   &[data-ratio="12:5"] mux-player { aspect-ratio: 12/5; }
   &[data-ratio="16:9"] mux-player { aspect-ratio: 16/9; }
-
-  // Cover overlay — absolutely fills whatever height mux-player establishes.
-  // Shown immediately on video switch, hidden once the player is ready.
-  &[data-ratio="4:3"]  .kh-player-cover { aspect-ratio: 4/3; }
-  &[data-ratio="12:5"] .kh-player-cover { aspect-ratio: 12/5; }
-  &[data-ratio="16:9"] .kh-player-cover { aspect-ratio: 16/9; }
-}
-
-.kh-player-cover {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  background-size: cover;
-  background-position: center;
-  background-color: var(--kh-bg-secondary);
-  z-index: 2;
-  transition: opacity 0.4s ease;
-  pointer-events: none;
-
-  &.kh-player-cover--hidden {
-    opacity: 0;
-    pointer-events: none;
-  }
 }
 
 // Video playlist
