@@ -94,13 +94,13 @@ function loadVideo(id) {
   player.setAttribute('playback-id', video.playbackId)
   player.setAttribute('metadata-video-title', video.title)
 
-  // 4. Fade cover out once mux-player has its poster ready.
-  //    Fallback timeout ensures it always clears even if the event misfires.
-  const revealPlayer = () => {
+  // 4. Fade cover out after mux-player has had time to resize and render
+  //    its poster. loadedmetadata fires before the player has finished
+  //    reflowing to its new aspect ratio, so a short fixed delay is more
+  //    reliable. 600ms covers the resize + poster render on any connection.
+  setTimeout(() => {
     if (playerCover) playerCover.classList.add('kh-player-cover--hidden')
-  }
-  player.addEventListener('loadedmetadata', revealPlayer, { once: true })
-  setTimeout(revealPlayer, 2000)
+  }, 600)
 
   window.scrollTo({ top: 0, behavior: 'smooth' })
 
