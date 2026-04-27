@@ -1,5 +1,6 @@
 import config from './site.config.js'
 import navHtml from '../pages/nav.html?raw'
+import bundledVideos from '../videos.json'
 
 // ── INJECT NAV ────────────────────────────────────────────────────────────────
 document.getElementById('kh-nav-mount').innerHTML = navHtml
@@ -61,19 +62,39 @@ function injectVideoSchema(videos) {
 }
 
 // ── DOM REFS ──────────────────────────────────────────────────────────────────
-const player     = document.getElementById('mainPlayer')
-const playerWrap = document.getElementById('playerWrap')
-const playlist   = document.getElementById('playlist')
+const player      = document.getElementById('mainPlayer')
+const playerSizer = document.getElementById('playerSizer')
+const playlist    = document.getElementById('playlist')
 
 // ── STATE ─────────────────────────────────────────────────────────────────────
 let activeId = null
 let videos   = []
 
 // ── LOAD VIDEO ────────────────────────────────────────────────────────────────
+const FADE_MS = 250 // ~6 frames out, ~6 frames in
+
 function loadVideo(id) {
   const video = videos.find(v => v.id === id)
   if (!video) return
 
+  // First load — no transition, just set immediately
+  if (activeId === null) {
+    applyVideo(id, video)
+    return
+  }
+
+  // Already showing this video — do nothing
+  if (activeId === id) return
+
+  // Fade out -> swap -> fade in
+  playerSizer.classList.add('kh-player-fading')
+  setTimeout(() => {
+    applyVideo(id, video)
+    playerSizer.classList.remove('kh-player-fading')
+  }, FADE_MS)
+}
+
+function applyVideo(id, video) {
   activeId = id
 
   const posterUrl = getPosterUrl(video)
@@ -81,7 +102,6 @@ function loadVideo(id) {
   player.setAttribute('playback-id', video.playbackId)
   player.setAttribute('metadata-video-title', video.title)
 
-  playerWrap.dataset.ratio = video.aspectRatio
   window.scrollTo({ top: 0, behavior: 'smooth' })
 
   document.querySelectorAll('.kh-playlist-link').forEach(btn => {
@@ -121,11 +141,10 @@ async function init() {
     playlist.innerHTML = '<li style="opacity:0.4; padding: 0.5rem 0;">Loading...</li>'
 
     const res  = await fetch('/.netlify/functions/get-videos')
-    const data = await res.json()
-    const all  = Array.isArray(data) ? data : []
+    const all  = res.ok ? (await res.json().catch(() => [])) : []
 
-    // Fall back to bundled JSON if Blobs is empty
-    const source = all.length > 0 ? all : (await import('../videos.json')).default || []
+    // Fall back to bundled JSON if Blobs is empty or function unavailable
+    const source = all.length > 0 ? all : bundledVideos || []
 
     // Work page only shows portfolio videos
     // Videos without showInPortfolio field default to true (backward compat)
@@ -146,14 +165,13 @@ async function init() {
 
   } catch (err) {
     console.error('work.js init error:', err)
-    try {
-      const fallback = await import('../videos.json')
-      const all = fallback.default || []
-      videos = all.filter(v => v.showInPortfolio !== false)
+    // Static import is always available — use it directly
+    videos = (bundledVideos || []).filter(v => v.showInPortfolio !== false)
+    if (videos.length > 0) {
       buildPlaylist()
       preloadAllCovers(videos)
-      if (videos.length > 0) loadVideo(videos[0].id)
-    } catch (e) {
+      loadVideo(videos[0].id)
+    } else {
       playlist.innerHTML = '<li style="color:red;">Failed to load videos</li>'
     }
   }

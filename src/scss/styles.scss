@@ -376,15 +376,44 @@ body {
 .kh-player-wrap {
   width: 100%;
   margin-bottom: 2.5rem;
+}
+
+// Fixed 4:3 container — all videos letterbox inside it.
+// Wider formats (12:5, 16:9) show black bars top and bottom,
+// which reads as intentional and filmic.
+.kh-player-sizer {
+  width: 100%;
+  aspect-ratio: 16/9;
+  position: relative;
+  background: #000;
 
   mux-player {
+    position: absolute;
+    inset: 0;
     width: 100%;
+    height: 100%;
     display: block;
+    filter: drop-shadow(-5px 5px 5px);
+    --media-object-fit: contain;
+    --media-object-position: center;
   }
 
-  &[data-ratio="4:3"]  mux-player { aspect-ratio: 4/3; }
-  &[data-ratio="12:5"] mux-player { aspect-ratio: 12/5; }
-  &[data-ratio="16:9"] mux-player { aspect-ratio: 16/9; }
+  // Fade-to-black overlay when switching videos
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: #000;
+    // background: var(--kh-text);
+    opacity: 0;
+    transition: opacity .25s ease-in-out; // ← change this
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  &.kh-player-fading::after {
+    opacity: 1;
+  }
 }
 
 // Video playlist
@@ -508,7 +537,7 @@ body {
   gap: 1.5rem;
   margin-top: 2.5rem;
   padding-top: 2rem;
-  border-top: 1px solid var(--kh-border);
+  border-top: 0px solid var(--kh-border);
 }
 
 .kh-social-link {
