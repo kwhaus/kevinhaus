@@ -205,7 +205,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const assetId     = document.getElementById('newAssetId').value.trim()
     const playbackId  = document.getElementById('newPlaybackId').value.trim()
     const stillsRaw   = document.getElementById('newStills').value.trim()
-    const coverEl     = document.getElementById('newCover')
+    const coverEl     = document.getElementById('newCoverImage')
     const coverImage  = coverEl ? coverEl.value.trim() : ''
     const portfolioEl = document.getElementById('newPortfolio')
     const showInPortfolio = portfolioEl ? portfolioEl.checked : true
@@ -231,7 +231,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     buildList()
 
-    ;['newTitle','newAssetId','newPlaybackId','newStills','newAspect'].forEach(id => {
+    ;['newTitle','newAssetId','newPlaybackId','newCoverImage','newStills','newAspect'].forEach(id => {
       const el = document.getElementById(id)
       if (el) el.value = ''
     })

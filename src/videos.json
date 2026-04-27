@@ -317,5 +317,41 @@
     "aspectRatio": "16:9",
     "stills": [],
     "showInPortfolio": false
+  },
+  {
+    "id": 19,
+    "title": "Lewis & Clarke - A Map of a Maze",
+    "artist": "Lewis & Clarke",
+    "song": "A Map of a Maze",
+    "type": "music video",
+    "assetId": "oViymXJzsmq0101Z01Ac6gMcPphtqwERC35olKlznDC178",
+    "playbackId": "sPLT9YnJVI5j64nv01tGC9eWyFHUpulJOse9xZia5JpY",
+    "coverImage": "cover_amapofamaze.webp",
+    "aspectRatio": "12:5",
+    "stills": [
+      "mapofamaze01.webp",
+      "mapofamaze02.webp",
+      "mapofamaze03.webp"
+    ],
+    "showInPortfolio": true
+  },
+  {
+    "id": 20,
+    "title": "Vans x Stoked",
+    "artist": "Vans x Stoked",
+    "song": "",
+    "type": "branded content",
+    "assetId": "2QZDgVCOqd8Eq8Q7D9tjdMAP7Ym6aT5DmRu3faRchdE",
+    "playbackId": "602G00MkUILB5cpzl1vSTM00bSI8E9W3So5XZ01HLP33bcg",
+    "coverImage": "cover_vansxstoked.webp",
+    "aspectRatio": "12:5",
+    "stills": [
+      "mapofamaze01.webp",
+      "mapofamaze02.webp",
+      "mapofamaze03.webp"
+    ],
+    "showInPortfolio": true
   }
-]
+
+
+]  
