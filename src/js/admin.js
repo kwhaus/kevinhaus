@@ -23,10 +23,50 @@ document.addEventListener('DOMContentLoaded', async () => {
   let videoList = []
   let adminPassword = ''
 
+  // ── AUTO-LOGIN FROM SESSION ─────────────────────────────────────────────────
+  function checkSession() {
+    try {
+      const session = sessionStorage.getItem('kh-admin-session')
+      if (!session) return false
+      
+      const { password, expiry } = JSON.parse(session)
+      
+      // Check if session has expired (4 hours = 14400000 ms)
+      if (Date.now() > expiry) {
+        sessionStorage.removeItem('kh-admin-session')
+        return false
+      }
+      
+      // Verify password still matches
+      if (password === config.adminPassword) {
+        adminPassword = password
+        return true
+      }
+    } catch {
+      sessionStorage.removeItem('kh-admin-session')
+    }
+    return false
+  }
+
+  // Auto-login if valid session exists
+  if (checkSession()) {
+    loginDiv.style.display = 'none'
+    panelDiv.style.display = 'block'
+    loadVideos()
+  }
+
   // ── LOGIN ────────────────────────────────────────────────────────────────────
   function tryLogin() {
     if (pwInput.value === config.adminPassword) {
       adminPassword = pwInput.value
+      
+      // Store session (expires in 4 hours)
+      const expiry = Date.now() + (4 * 60 * 60 * 1000)
+      sessionStorage.setItem('kh-admin-session', JSON.stringify({
+        password: adminPassword,
+        expiry
+      }))
+      
       loginDiv.style.display = 'none'
       panelDiv.style.display = 'block'
       loadVideos()

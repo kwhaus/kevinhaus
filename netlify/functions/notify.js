@@ -1,7 +1,10 @@
 // ── NOTIFY ────────────────────────────────────────────────────────────────────
 // Called when a client opens a reel URL.
 // Sends an email to hello@kevinhaus.com via Resend.
+// Only sends email on FIRST view per unique session.
 // Expects POST body: { reelId, clientName, timestamp }
+
+import { getStore } from '@netlify/blobs'
 
 export default async (req, context) => {
 
@@ -23,6 +26,41 @@ export default async (req, context) => {
   try {
     const { reelId, clientName, timestamp } = await req.json()
 
+    // Generate a session fingerprint from IP and User-Agent
+    const ip = req.headers.get('x-forwarded-for') || 
+               req.headers.get('x-real-ip') || 
+               'unknown'
+    const userAgent = req.headers.get('user-agent') || 'unknown'
+    const sessionId = `${ip}_${userAgent.substring(0, 50)}` // Truncate UA to avoid huge keys
+    const viewKey = `view_${reelId}_${sessionId}`
+
+    // Check if this session has already viewed this reel
+    const viewsStore = getStore('reel-views')
+    const alreadyViewed = await viewsStore.get(viewKey)
+
+    if (alreadyViewed) {
+      // Session already viewed this reel, don't send email
+      return new Response(JSON.stringify({ ok: true, alreadyNotified: true }), {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+        },
+      })
+    }
+
+    // Mark this session as having viewed this reel
+    // Store view with 30-day expiration
+    await viewsStore.setJSON(viewKey, {
+      reelId,
+      clientName,
+      timestamp,
+      ip,
+    }, {
+      metadata: { expires: Date.now() + (30 * 24 * 60 * 60 * 1000) }
+    })
+
+    // Send email notification for first-time view
     const apiKey = process.env.RESEND_API_KEY
     if (!apiKey) {
       return new Response(JSON.stringify({ error: 'Resend API key not configured' }), {
@@ -51,7 +89,7 @@ export default async (req, context) => {
         subject: `Reel viewed: ${clientName || reelId}`,
         html: `
           <p style="font-family: sans-serif; font-size: 16px;">
-            Your reel was viewed.
+            Your reel was viewed for the first time by this viewer.
           </p>
           <table style="font-family: sans-serif; font-size: 14px; border-collapse: collapse;">
             <tr>
@@ -75,6 +113,9 @@ export default async (req, context) => {
               </td>
             </tr>
           </table>
+          <p style="font-family: sans-serif; font-size: 12px; color: #999; margin-top: 16px;">
+            Note: You'll only receive one email per unique viewer for this reel.
+          </p>
         `,
       }),
     })
@@ -88,7 +129,7 @@ export default async (req, context) => {
       })
     }
 
-    return new Response(JSON.stringify({ ok: true }), {
+    return new Response(JSON.stringify({ ok: true, notified: true }), {
       status: 200,
       headers: {
         'Content-Type': 'application/json',

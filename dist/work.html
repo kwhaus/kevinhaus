@@ -15,15 +15,14 @@
   <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png">
   <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
   <!-- Preload first video cover so it appears before JS runs -->
-  <link rel="preload" as="image" href="/assets/Covers/cover_PurpleStrings.jpg" fetchpriority="high">
+  <link rel="preload" as="image" href="/assets/Covers/cover_PurpleStrings.webp" fetchpriority="high">
   <!-- VideoObject structured data injected by work.js -->
-  <script src="https://cdn.jsdelivr.net/npm/@mux/mux-player" defer></script>
-  <script type="module" crossorigin src="/assets/work-84rD2un8.js"></script>
-  <link rel="modulepreload" crossorigin href="/assets/rolldown-runtime-BsEtRdTP.js">
-  <link rel="modulepreload" crossorigin href="/assets/bootstrap-Cbo2cs6e.js">
-  <link rel="modulepreload" crossorigin href="/assets/nav-DImyApw8.js">
-  <link rel="modulepreload" crossorigin href="/assets/videos-Bjk9PVz8.js">
-  <link rel="stylesheet" crossorigin href="/assets/nav-C_tusQbI.css">
+  <script src="https://cdn.jsdelivr.net/npm/@mux/mux-player@3.11.7" defer></script>
+  <script type="module" crossorigin src="/assets/work-BIaER9W-.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/bootstrap-DXJ4S3oZ.js">
+  <link rel="modulepreload" crossorigin href="/assets/nav-Cgz8DOGs.js">
+  <link rel="modulepreload" crossorigin href="/assets/videos-GnhTJzeq.js">
+  <link rel="stylesheet" crossorigin href="/assets/nav-B3gBouJs.css">
 </head>
 <body>
 
@@ -35,7 +34,9 @@
       data-logo-dark="/assets/KH_Square_wht.png"
       data-logo-swap
       alt=""
-    >
+          width="48"
+          height="48"
+        >
   </div>
 
 
@@ -46,14 +47,15 @@
     <div class="kh-work">
 
       <!-- Video player -->
-      <div class="kh-player-wrap" id="playerWrap" data-ratio="4:3">
-        <mux-player
-          id="mainPlayer"
-          playback-id=""
-          metadata-video-title=""
-          playsinline
-          style="width:100%; display:block;"
-        ></mux-player>
+      <div class="kh-player-wrap" id="playerWrap">
+        <div class="kh-player-sizer" id="playerSizer">
+          <mux-player
+            id="mainPlayer"
+            playback-id=""
+            metadata-video-title=""
+            playsinline
+          ></mux-player>
+        </div>
       </div>
 
       <!-- Numbered playlist -->
@@ -72,6 +74,8 @@
           data-logo-dark="/assets/KH_Square_wht.png"
           data-logo-swap
           alt="KH"
+          width="48"
+          height="48"
         >
       </div>
       <a href="mailto:hello@kevinhaus.com" class="kh-footer-email">
