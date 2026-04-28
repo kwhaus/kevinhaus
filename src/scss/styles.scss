@@ -55,7 +55,7 @@ $transition-base: all 0.2s ease-in-out;
   --kh-accent:       #fe0000;
   --kh-nav-bg:       rgba(10, 10, 10, 0.96);
   --kh-overlay-bg:   rgba(20, 20, 20, 0.92);
-  --kh-shadow:       2px 3px 6px rgba(0, 0, 0, 0.6);
+  --kh-shadow:       -2px 2px 2px rgba(0, 0, 0, 0.5);
 }
 
 // ── BASE ──────────────────────────────────────────────────────────────────────
@@ -606,7 +606,6 @@ body {
 
 .kh-reel-viewer-player-col {
   flex: 1;
-  min-width: 0;
 }
 
 .kh-reel-viewer-wrap {
