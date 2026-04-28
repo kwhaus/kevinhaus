@@ -393,7 +393,7 @@ body {
     width: 100%;
     height: 100%;
     display: block;
-    filter: drop-shadow(-5px 5px 5px);
+    filter: drop-shadow(-3px 3px 3px rgba(0,0,0,0.5));
     --media-object-fit: contain;
     --media-object-position: center;
   }
