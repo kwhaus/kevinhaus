@@ -145,4 +145,4 @@ src.zip
 public/.DS_Store
 public/assets/.DS_Store
 assets/Stills/
-assets/Covers/
+assets/Covers/node_modules/
