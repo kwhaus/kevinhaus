@@ -58,17 +58,27 @@ function withSlugs(videos) {
 }
 
 // Where the video list comes from:
-//  • Netlify build → the catalogue the admin saved to Netlify Blobs
-//    (store "videos", key "catalog"; see netlify/functions/save-videos.js)
-//  • otherwise, or if Blobs is empty/unreachable → src/videos.json
-// Set KH_VIDEOS_SOURCE=file to force the file (e.g. to test a local change).
+//  • Netlify build → the catalogue saved from the admin (Netlify Blobs: store
+//    "videos", key "catalog"; written by netlify/functions/save-videos.js)
+//  • otherwise, or if Blobs can't be read → src/videos.json
+// Set KH_VIDEOS_SOURCE=file to force the file.
+//
+// Blobs isn't configured automatically inside the build command, so on Netlify
+// we pass the site ID (Netlify sets SITE_ID during builds) and a Netlify
+// access token from the BLOBS_TOKEN environment variable.
 let remoteCatalog = null
 
 async function fetchRemoteCatalog(warn) {
   if (process.env.KH_VIDEOS_SOURCE === 'file') return null
   try {
     const { getStore } = await import('@netlify/blobs')
-    const store = getStore({ name: 'videos', consistency: 'strong' })
+    const siteID = process.env.SITE_ID || process.env.NETLIFY_SITE_ID || process.env.KH_SITE_ID
+    const token = process.env.BLOBS_TOKEN
+    const store = getStore(
+      siteID && token
+        ? { name: 'videos', siteID, token, consistency: 'strong' }
+        : { name: 'videos', consistency: 'strong' }
+    )
     const catalog = await store.get('catalog', { type: 'json' })
     if (catalog && Array.isArray(catalog.videos) && catalog.videos.length) {
       return catalog.videos
@@ -78,7 +88,7 @@ async function fetchRemoteCatalog(warn) {
     // Locally there is no Blobs context, which is expected. On Netlify it is
     // not, so say so loudly: admin edits will not be published.
     if (process.env.NETLIFY) {
-      warn(`could not read Netlify Blobs (${err.message}) — using src/videos.json. Admin edits will NOT appear on this build.`)
+      warn(`could not read Netlify Blobs (${err.message}) — using src/videos.json. Admin edits will NOT appear on this build. [prerender v3] SITE_ID: ${process.env.SITE_ID || process.env.NETLIFY_SITE_ID || process.env.KH_SITE_ID ? 'set' : 'MISSING'}, BLOBS_TOKEN: ${process.env.BLOBS_TOKEN ? 'set' : 'MISSING'}`)
     }
   }
   return null
