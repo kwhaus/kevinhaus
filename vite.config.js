@@ -2,7 +2,7 @@ import { resolve, dirname } from 'path'
 import { fileURLToPath } from 'url'
 import { defineConfig } from 'vite'
 import purgecss from 'vite-plugin-purgecss'
-import prerender from './build/prerender.js'          // ← NEW
+import prerender from './build/prerender.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
@@ -13,7 +13,7 @@ export default defineConfig({
   publicDir: resolve(__dirname, 'public'),
 
   plugins: [
-    prerender(),                                       // ← NEW (must come before purgecss)
+    prerender(),                                       // must come before purgecss
     purgecss({
       content: [
         resolve(__dirname, 'src/**/*.html'),
@@ -31,7 +31,10 @@ export default defineConfig({
           /^data-bs-theme/,
           // Prerendered playlist classes — generated at build time, so the
           // static scan of src/ won't always see them.
-          /^kh-playlist/,                               // ← NEW
+          /^kh-playlist/,
+          // Project-page markup is generated in build/prerender.js, which
+          // PurgeCSS doesn't scan.
+          /^kh-project/,
         ],
         deep: [
           /dragging/,
@@ -50,6 +53,9 @@ export default defineConfig({
       input: {
         main:    resolve(__dirname, 'src/index.html'),
         work:    resolve(__dirname, 'src/work.html'),
+        // Template for /work/<slug>/ — prerender.js stamps one page per project
+        // from it, then removes it from dist.
+        project: resolve(__dirname, 'src/project.html'),
         about:   resolve(__dirname, 'src/about.html'),
         contact: resolve(__dirname, 'src/contact.html'),
         reel:    resolve(__dirname, 'src/reel.html'),

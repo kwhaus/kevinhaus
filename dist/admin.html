@@ -15,11 +15,12 @@
       document.getElementById('tabReels').classList.toggle('kh-admin-tab--active',  tab === 'reels')
     }
   </script>
-  <script type="module" crossorigin src="/assets/admin-CJqopPOZ.js"></script>
+  <script type="module" crossorigin src="/assets/admin-Bq6KfeXi.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/bootstrap-DXJ4S3oZ.js">
-  <link rel="modulepreload" crossorigin href="/assets/nav-xj7-ZDB3.js">
+  <link rel="modulepreload" crossorigin href="/assets/main-GyA5r6Kq.js">
   <link rel="modulepreload" crossorigin href="/assets/videos-JnPdLiFr.js">
-  <link rel="stylesheet" crossorigin href="/assets/nav-Z3ak2eSK.css">
+  <link rel="modulepreload" crossorigin href="/assets/nav--4yGJyFM.js">
+  <link rel="stylesheet" crossorigin href="/assets/main-Cus07uUX.css">
 </head>
 <body>
 
@@ -101,7 +102,7 @@
   <div class="offcanvas-body">
     <ul class="kh-nav-links" id="khOffcanvasLabel">
       <li><a href="/index.html" class="kh-nav-link">Home</a></li>
-      <li><a href="/work.html" class="kh-nav-link">Work</a></li>
+      <li><a href="/work/nothing-purple-strings/" class="kh-nav-link" data-section="work">Work</a></li>
       <li><a href="/about.html" class="kh-nav-link">About</a></li>
       <li><a href="/contact.html" class="kh-nav-link">Contact</a></li>
     </ul>
@@ -155,7 +156,7 @@
         <div id="panelVideos">
 
           <div class="kh-admin-header">
-            <span>Video List — drag to reorder</span>
+            <span>Video List — drag to reorder, Edit to change details</span>
           </div>
 
           <div id="adminList"></div>
@@ -218,6 +219,7 @@
               ↑ Save to Live Site
             </button>
             <span id="saveStatus" style="font-size:0.85rem;"></span>
+            <button id="resetFromFile" type="button" class="btn btn-sm btn-link ms-auto p-0" style="font-family:inherit; font-size:0.75rem; color:var(--kh-text-muted); text-decoration:none;">Reload from videos.json</button>
           </div>
 
         </div>

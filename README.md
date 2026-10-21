@@ -198,5 +198,28 @@ If you rename the file, update the path in `src/scss/styles.scss` → `@font-fac
 - Thumbnail images on the reel page are pulled automatically from:
   `https://image.mux.com/{PLAYBACK_ID}/thumbnail.webp`
 - No Mux API key is needed for playback — Playback IDs are public
-test
-test2
+
+---
+
+## Updating the Netlify token
+
+Netlify personal access tokens expire. When Netlify sends an expiry warning email, rotate the token like this. You can't edit a token in place, so you create a new one, swap it in, and delete the old one.
+
+**Where the token lives:** the `.env` file in the project root, as `NETLIFY_AUTH_TOKEN`. (Nothing is stored in GitHub secrets, and the Mac has no Netlify CLI login. GitHub access is separate: it uses the `gh` CLI login for account `kwhaus`.)
+
+1. **Create a new token.** Netlify → avatar → User settings → Applications → Personal access tokens → New access token. Give it a descriptive name (e.g. `kevinhaus-deploy`), set an expiration, and copy it immediately. It's only shown once.
+2. **Update `.env`.** Replace the old value and keep the variable name as is:
+```
+   NETLIFY_AUTH_TOKEN=your_new_token_here
+```
+3. **Test without deploying.** This only reads account info:
+```bash
+    export TOKEN="your_new_token_here"
+   curl -s -H "Authorization: Bearer $TOKEN" https://api.netlify.com/api/v1/user | head -c 300
+   unset TOKEN
+```
+   (The leading space on the `export` line keeps the token out of shell history.) A valid token returns JSON with your account name and email. An invalid one returns an error.
+4. **Delete the old token.** Back in Applications, delete the expiring one, matching it by name and date.
+5. **Set a reminder** a couple of weeks before the new token's expiration date.
+
+**Keep it out of git.** `.env` must be listed in `.gitignore`. Check with `git check-ignore .env`. If it was ever committed, treat the old token as exposed and delete it right away.

@@ -30,6 +30,10 @@ function setActiveNav() {
   const path = window.location.pathname
   document.querySelectorAll('.kh-nav-link').forEach(link => {
     const href = link.getAttribute('href') || ''
+    if (link.dataset.section) {
+      link.classList.toggle('active', path.startsWith('/' + link.dataset.section))
+      return
+    }
     const isHome = (href === '/index.html' || href === '/') && (path === '/' || path.endsWith('index.html'))
     const isMatch = !isHome && href !== '/' && href !== '/index.html' && path.includes(href.replace('.html', ''))
     link.classList.toggle('active', isHome || isMatch)

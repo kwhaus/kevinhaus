@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- TEMPLATE for every /work/<slug>/ page.
+       build/prerender.js replaces the KH:HEAD and KH:BODY markers once per
+       project. This file is never served as-is (it is removed from dist). -->
+  <!--KH:HEAD-->
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png">
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+  <script src="https://cdn.jsdelivr.net/npm/@mux/mux-player@3.11.7" defer></script>
+  <script type="module" src="/js/main.js"></script>
+</head>
+<body data-page="project">
+
+  <!-- Preloader -->
+  <div class="kh-preloader" id="khPreloader">
+    <img
+      src="/assets/KH_Square.png"
+      data-logo-light="/assets/KH_Square.png"
+      data-logo-dark="/assets/KH_Square_wht.png"
+      data-logo-swap
+      alt=""
+      width="48"
+      height="48"
+    >
+  </div>
+
+  <div id="kh-nav-mount"></div>
+
+  <main class="kh-page">
+    <!--KH:BODY-->
+
+    <footer class="kh-footer">
+      <div class="kh-footer-logo">
+        <img
+          src="/assets/KH_Square.png"
+          data-logo-light="/assets/KH_Square.png"
+          data-logo-dark="/assets/KH_Square_wht.png"
+          data-logo-swap
+          alt="KH"
+          width="48"
+          height="48"
+        >
+      </div>
+      <a href="mailto:hello@kevinhaus.com" class="kh-footer-email" title="Email me">hello@kevinhaus.com</a>
+    </footer>
+  </main>
+
+</body>
+</html>

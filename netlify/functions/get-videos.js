@@ -1,17 +1,17 @@
 import { getStore } from '@netlify/blobs'
 
 // ── GET VIDEOS ────────────────────────────────────────────────────────────────
-// Public function — no auth required.
-// Returns the video list from Netlify Blobs.
-// On first run (nothing in Blobs yet), returns empty array.
-// The admin save-videos function populates Blobs on first save.
+// Public (this data is already on the public site). Returns the catalogue the
+// admin last saved, or [] if it has never been saved — in which case the admin
+// starts from the bundled src/videos.json.
 
-export default async (req, context) => {
+export default async () => {
   try {
     const store = getStore('videos')
-    const data  = await store.get('list', { type: 'json' })
+    const catalog = await store.get('catalog', { type: 'json' })
+    const videos = catalog && Array.isArray(catalog.videos) ? catalog.videos : []
 
-    return new Response(JSON.stringify(data || []), {
+    return new Response(JSON.stringify(videos), {
       status: 200,
       headers: {
         'Content-Type': 'application/json',

@@ -21,6 +21,22 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ── STATE ────────────────────────────────────────────────────────────────────
   let videoList = []
   let adminPassword = ''
+  let dirty = false          // unsaved changes in the list
+  let editingId = null       // id of the entry whose edit panel is open
+
+  const esc = (str = '') =>
+    String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+
+  function markDirty() {
+    dirty = true
+    if (saveStatus) {
+      saveStatus.textContent = 'Unsaved changes'
+      saveStatus.style.color = 'var(--kh-text-muted)'
+    }
+  }
+  window.addEventListener('beforeunload', e => {
+    if (dirty) { e.preventDefault(); e.returnValue = '' }
+  })
 
   // ── SERVER-SIDE PASSWORD CHECK ──────────────────────────────────────────────
   // The password is only ever compared on the server (admin-login function).
@@ -81,43 +97,24 @@ document.addEventListener('DOMContentLoaded', async () => {
   loginBtn.addEventListener('click', tryLogin)
   pwInput.addEventListener('keydown', e => { if (e.key === 'Enter') tryLogin() })
 
-  // ── LOAD VIDEOS FROM BLOBS ───────────────────────────────────────────────────
+  // ── LOAD VIDEOS ──────────────────────────────────────────────────────────────
+  // The catalogue saved from this page (Netlify Blobs) is the source of truth
+  // and is what the site rebuilds from. Until the first save from here, start
+  // from the bundled src/videos.json, which is what the live site is built from.
   async function loadVideos() {
     try {
       listEl.innerHTML = '<div style="opacity:0.4; padding:1rem 0;">Loading...</div>'
       const res  = await fetch('/.netlify/functions/get-videos')
       const data = await res.json()
-
-      if (Array.isArray(data) && data.length > 0) {
-        // Merge: use Blobs for ordering/showInPortfolio, but take stills +
-        // coverImage from bundled JSON so .webp filenames are always current.
-        const bundledMap = new Map(videosData.map(v => [v.id, v]))
-        videoList = data.map(blobVideo => {
-          const bundled = bundledMap.get(blobVideo.id)
-          if (!bundled) return blobVideo
-          return {
-            ...blobVideo,
-            stills:      bundled.stills,
-            coverImage:  bundled.coverImage,
-          }
-        })
-        // Append any bundled videos missing from Blobs entirely —
-        // happens when new videos are added to videos.json but Blobs
-        // hasn't been saved since (e.g. IDs 15-18 after a partial save).
-        const blobIds = new Set(data.map(v => v.id))
-        videosData.forEach(v => {
-          if (!blobIds.has(v.id)) videoList.push({ ...v })
-        })
-      } else {
-        videoList = videosData.map(v => ({ ...v }))
-      }
+      videoList = Array.isArray(data) && data.length > 0
+        ? data
+        : videosData.map(v => ({ ...v }))
     } catch {
-      // Fall back to bundled JSON
       videoList = videosData.map(v => ({ ...v }))
     }
+    dirty = false
     buildList()
     buildReelPicker()
-    // Reels are now password-protected, so they load only after login.
     loadReels()
   }
 
@@ -137,20 +134,29 @@ document.addEventListener('DOMContentLoaded', async () => {
         },
         body: JSON.stringify({ videos: videoList }),
       })
+      const result = await res.json().catch(() => ({}))
 
       if (res.ok) {
+        dirty = false
         if (saveStatus) {
-          saveStatus.textContent = '✓ Saved live'
-          saveStatus.style.color = 'green'
-          setTimeout(() => { saveStatus.textContent = '' }, 3000)
+          if (result.rebuild) {
+            saveStatus.textContent = '✓ Saved — site is rebuilding (about a minute)'
+            saveStatus.style.color = 'green'
+          } else if (result.hookConfigured === false) {
+            saveStatus.textContent = '✓ Saved, but BUILD_HOOK_URL is not set — site not rebuilt'
+            saveStatus.style.color = 'orange'
+          } else {
+            saveStatus.textContent = '✓ Saved, but the rebuild request failed — trigger a deploy in Netlify'
+            saveStatus.style.color = 'orange'
+          }
         }
       } else {
-        throw new Error('Save failed')
+        throw new Error(result.error || 'Save failed')
       }
     } catch (err) {
       console.error('Save error:', err)
       if (saveStatus) {
-        saveStatus.textContent = '✗ Save failed'
+        saveStatus.textContent = `✗ Save failed — ${err.message}`
         saveStatus.style.color = 'red'
       }
     }
@@ -169,13 +175,16 @@ document.addEventListener('DOMContentLoaded', async () => {
       card.innerHTML = `
         <span class="kh-admin-drag-handle" title="Drag to reorder">⠿</span>
         <span class="kh-admin-num">${String(index + 1).padStart(2, '0')}</span>
-        <span class="kh-admin-title">${video.title}</span>
-        <span class="kh-admin-type">${video.type}</span>
+        <span class="kh-admin-title">${esc(video.title)}</span>
+        <span class="kh-admin-type">${esc(video.type)}</span>
         <label class="kh-admin-toggle" title="Show in portfolio">
           <input type="checkbox" class="portfolio-toggle" data-index="${index}"
             ${video.showInPortfolio !== false ? 'checked' : ''}>
           <span class="kh-admin-toggle-label">Portfolio</span>
         </label>
+        <button class="btn btn-sm btn-link p-0 ms-2 edit-btn" data-index="${index}"
+          style="font-size:0.75rem; letter-spacing:0.06em; color:var(--kh-text-muted); text-decoration:none;"
+        >${editingId === video.id ? 'Close' : 'Edit'}</button>
         <button class="btn btn-sm btn-link p-0 ms-2 text-danger delete-btn"
           data-index="${index}"
           title="Remove from list"
@@ -186,6 +195,14 @@ document.addEventListener('DOMContentLoaded', async () => {
       card.querySelector('.portfolio-toggle').addEventListener('change', e => {
         const i = parseInt(e.currentTarget.dataset.index)
         videoList[i].showInPortfolio = e.currentTarget.checked
+        markDirty()
+      })
+
+      card.querySelector('.edit-btn').addEventListener('click', e => {
+        e.stopPropagation()
+        const id = videoList[parseInt(e.currentTarget.dataset.index)].id
+        editingId = editingId === id ? null : id
+        buildList()
       })
 
       card.querySelector('.delete-btn').addEventListener('click', e => {
@@ -193,14 +210,137 @@ document.addEventListener('DOMContentLoaded', async () => {
         const i = parseInt(e.currentTarget.dataset.index)
         if (confirm(`Remove "${videoList[i].title}" from the list?`)) {
           videoList.splice(i, 1)
+          markDirty()
           buildList()
+          buildReelPicker()
         }
       })
 
       listEl.appendChild(card)
+      if (editingId === video.id) listEl.appendChild(buildEditPanel(video))
     })
 
     initDragDrop()
+  }
+
+  // ── EDIT PANEL ───────────────────────────────────────────────────────────────
+  // One field per property in videos.json. List fields take one item per line.
+  // Leaving a field blank removes it from the entry.
+  const TYPES = ['music video', 'commercial', 'branded content', 'short film', 'reel']
+  const FIELDS = [
+    { key: 'title',        label: 'Title',                       half: true },
+    { key: 'type',         label: 'Type',                        half: true, select: TYPES },
+    { key: 'client',       label: 'Client',                      half: true },
+    { key: 'agency',       label: 'Agency',                      half: true },
+    { key: 'project',      label: 'Project / song',              half: true },
+    { key: 'date',         label: 'Date (YYYY or YYYY-MM-DD)',   half: true },
+    { key: 'aspectRatio',  label: 'Aspect ratio (e.g. 16:9)',    half: true },
+    { key: 'slug',         label: 'URL slug (blank = from title; changing it changes the page URL)', half: true },
+    { key: 'playbackId',   label: 'Mux playback ID',             half: true, required: true },
+    { key: 'assetId',      label: 'Mux asset ID',                half: true },
+    { key: 'coverImage',   label: 'Cover image filename',        half: true },
+    { key: 'stills',       label: 'Stills — filenames, one per line (project page gallery)', list: true },
+    { key: 'featuredStills', label: 'Home-page stills — one per line (blank = use all stills)', list: true },
+    { key: 'festivals',    label: 'Festivals / premieres — one per line', list: true },
+    { key: 'awards',       label: 'Awards — one per line',       list: true },
+    { key: 'note',         label: 'Press quote / note',          area: true },
+    { key: 'btsPlaybackId', label: 'Behind-the-scenes video — Mux playback ID', half: true },
+    { key: 'btsPhotos',    label: 'BTS photos — filenames in assets/BTS/<slug>/, one per line (blank = use every image in that folder)', list: true },
+  ]
+
+  const inputStyle = 'background:var(--kh-bg-secondary); border-color:var(--kh-border); color:var(--kh-text); font-family:inherit;'
+
+  function buildEditPanel(video) {
+    const panel = document.createElement('div')
+    panel.className = 'kh-admin-edit'
+    panel.style.cssText = 'border:1px solid var(--kh-border); border-top:none; padding:1rem; margin:-0.25rem 0 0.75rem;'
+
+    const row = document.createElement('div')
+    row.className = 'row g-2'
+
+    FIELDS.forEach(f => {
+      const col = document.createElement('div')
+      col.className = f.half ? 'col-12 col-md-6' : 'col-12'
+      const label = document.createElement('label')
+      label.textContent = f.label
+      label.style.cssText = 'display:block; font-size:0.7rem; letter-spacing:0.05em; color:var(--kh-text-muted); margin-bottom:0.2rem;'
+
+      let input
+      if (f.select) {
+        input = document.createElement('select')
+        input.className = 'form-select form-select-sm'
+        const opts = f.select.includes(video[f.key]) || !video[f.key] ? f.select : [...f.select, video[f.key]]
+        opts.forEach(o => {
+          const opt = document.createElement('option')
+          opt.value = o; opt.textContent = o
+          input.appendChild(opt)
+        })
+        input.value = video[f.key] || f.select[0]
+      } else if (f.list || f.area) {
+        input = document.createElement('textarea')
+        input.className = 'form-control form-control-sm'
+        input.rows = f.list ? Math.min(8, Math.max(3, (video[f.key] || []).length + 1)) : 2
+        input.value = f.list ? (Array.isArray(video[f.key]) ? video[f.key].join('\n') : '') : (video[f.key] || '')
+      } else {
+        input = document.createElement('input')
+        input.type = 'text'
+        input.className = 'form-control form-control-sm'
+        input.value = video[f.key] ?? ''
+      }
+      input.style.cssText = inputStyle
+      input.dataset.field = f.key
+      col.append(label, input)
+      row.appendChild(col)
+    })
+
+    const actions = document.createElement('div')
+    actions.className = 'col-12'
+    actions.style.cssText = 'display:flex; gap:0.75rem; align-items:center;'
+    const apply = document.createElement('button')
+    apply.className = 'btn btn-sm btn-outline-secondary'
+    apply.style.cssText = 'font-family:inherit; letter-spacing:0.06em;'
+    apply.textContent = 'Apply changes'
+    const msg = document.createElement('span')
+    msg.style.cssText = 'font-size:0.75rem; color:var(--kh-text-muted);'
+    msg.textContent = 'Applies to the list below — then press Save to Live Site.'
+    actions.append(apply, msg)
+    row.appendChild(actions)
+    panel.appendChild(row)
+
+    apply.addEventListener('click', () => {
+      const next = { ...video }
+      for (const f of FIELDS) {
+        const raw = panel.querySelector(`[data-field="${f.key}"]`).value
+        if (f.list) {
+          const items = raw.split(/[\n,]+/).map(x => x.trim()).filter(Boolean)
+          if (items.length) next[f.key] = items; else delete next[f.key]
+        } else {
+          const val = raw.trim()
+          if (val) next[f.key] = val
+          else if (f.required || f.key === 'title') next[f.key] = ''
+          else delete next[f.key]
+        }
+      }
+      if (next.slug) next.slug = next.slug.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')
+      if (!next.title || !next.playbackId) {
+        msg.textContent = 'Title and Mux playback ID are required.'
+        msg.style.color = 'red'
+        return
+      }
+      if (next.slug && videoList.some(v => v.id !== video.id && v.slug === next.slug)) {
+        msg.textContent = 'Another entry already uses that slug.'
+        msg.style.color = 'red'
+        return
+      }
+      const i = videoList.findIndex(v => v.id === video.id)
+      videoList[i] = next
+      editingId = null
+      markDirty()
+      buildList()
+      buildReelPicker()
+    })
+
+    return panel
   }
 
   // ── DRAG AND DROP ────────────────────────────────────────────────────────────
@@ -235,6 +375,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const moved = videoList.splice(dragSrcIndex, 1)[0]
         videoList.splice(targetIndex, 0, moved)
         dragSrcIndex = null
+        markDirty()
         buildList()
       })
     })
@@ -272,7 +413,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       showInPortfolio,
     })
 
+    markDirty()
     buildList()
+    buildReelPicker()
 
     ;['newTitle','newAssetId','newPlaybackId','newCoverImage','newStills','newAspect'].forEach(id => {
       const el = document.getElementById(id)
@@ -286,6 +429,21 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (saveBtn) {
     saveBtn.textContent = 'Save to Live Site'
     saveBtn.addEventListener('click', saveVideos)
+  }
+
+  // ── RELOAD FROM videos.json ──────────────────────────────────────────────────
+  // Replaces the list on screen with the file bundled in the site. Nothing is
+  // saved until you press Save to Live Site.
+  const resetBtn = document.getElementById('resetFromFile')
+  if (resetBtn) {
+    resetBtn.addEventListener('click', () => {
+      if (!confirm('Replace the list on screen with the videos.json that ships with the site? Unsaved edits are lost; nothing is published until you press Save.')) return
+      videoList = videosData.map(v => ({ ...v }))
+      editingId = null
+      markDirty()
+      buildList()
+      buildReelPicker()
+    })
   }
 
   // ── REELS TAB ─────────────────────────────────────────────────────────────────
@@ -370,8 +528,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       const item = document.createElement('div')
       item.className = 'kh-reel-pick-item'
       item.innerHTML = `
-        <span class="pick-title">${video.title}</span>
-        <span class="pick-type">${video.type}</span>
+        <span class="pick-title">${esc(video.title)}</span>
+        <span class="pick-type">${esc(video.type)}</span>
         <span class="pick-action">+</span>
       `
       item.addEventListener('click', () => addToReel(video))
@@ -402,8 +560,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       item.dataset.index = index
       item.innerHTML = `
         <span style="color:var(--kh-text-muted); font-size:0.7rem; flex-shrink:0;">⠿</span>
-        <span class="pick-title">${video.title}</span>
-        <span class="pick-type">${video.type}</span>
+        <span class="pick-title">${esc(video.title)}</span>
+        <span class="pick-type">${esc(video.type)}</span>
         <span class="pick-action reel-remove" data-index="${index}" style="cursor:pointer;">×</span>
       `
       item.querySelector('.reel-remove').addEventListener('click', e => {

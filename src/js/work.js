@@ -50,24 +50,24 @@ const videos = readVideos()
 // ── LOAD VIDEO ────────────────────────────────────────────────────────────────
 const FADE_MS = 250
 
-function loadVideo(id) {
+function loadVideo(id, { push = true } = {}) {
   const video = videos.find(v => v.id === id)
   if (!video) return
 
   if (activeId === null) {
-    applyVideo(id, video)
+    applyVideo(id, video, { push: false })
     return
   }
   if (activeId === id) return
 
   playerSizer.classList.add('kh-player-fading')
   setTimeout(() => {
-    applyVideo(id, video)
+    applyVideo(id, video, { push })
     playerSizer.classList.remove('kh-player-fading')
   }, FADE_MS)
 }
 
-function applyVideo(id, video) {
+function applyVideo(id, video, { push = true } = {}) {
   activeId = id
 
   player.setAttribute('poster', getPosterUrl(video))
@@ -76,22 +76,36 @@ function applyVideo(id, video) {
 
   window.scrollTo({ top: 0, behavior: 'smooth' })
 
-  document.querySelectorAll('.kh-playlist-link').forEach(btn => {
-    btn.classList.toggle('active', parseInt(btn.dataset.id, 10) === id)
+  document.querySelectorAll('.kh-playlist-link').forEach(link => {
+    link.classList.toggle('active', parseInt(link.dataset.id, 10) === id)
   })
 
-  const url = new URL(window.location)
-  url.searchParams.set('v', id)
-  history.pushState({ videoId: id }, '', url)
+  // The address bar shows the project's own page (/work/<slug>/), so copying
+  // it or reloading lands on that project's page.
+  if (push) history.pushState({ videoId: id }, '', video.url)
+}
+
+// Which video does the current address point at? /work/<slug>/ or the legacy
+// ?v=<id> form (production redirects ?v= to the slug URL; this covers dev).
+function idFromLocation() {
+  const slug = (window.location.pathname.match(/^\/work\/([^/]+)\/?$/) || [])[1]
+  const bySlug = slug && videos.find(v => v.slug === slug)
+  if (bySlug) return bySlug.id
+  const paramId = parseInt(new URLSearchParams(window.location.search).get('v'), 10)
+  return videos.find(v => v.id === paramId) ? paramId : null
 }
 
 // ── HYDRATE ───────────────────────────────────────────────────────────────────
-// The <li> elements already exist in the HTML. Attach behaviour, don't rebuild.
+// The playlist items are real <a href="/work/<slug>/"> links in the HTML, so
+// crawlers can follow them. For visitors we intercept the click and swap the
+// player in place; middle-click / cmd-click still open the project page.
 function hydratePlaylist() {
   playlist.addEventListener('click', e => {
-    const btn = e.target.closest('.kh-playlist-link')
-    if (!btn) return
-    loadVideo(parseInt(btn.dataset.id, 10))
+    const link = e.target.closest('.kh-playlist-link')
+    if (!link) return
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return
+    e.preventDefault()
+    loadVideo(parseInt(link.dataset.id, 10))
   })
 }
 
@@ -105,12 +119,18 @@ function init() {
   hydratePlaylist()
   preloadAllCovers(videos)
 
-  const paramId = parseInt(new URLSearchParams(window.location.search).get('v'), 10)
-  loadVideo(videos.find(v => v.id === paramId) ? paramId : videos[0].id)
+  const startId = idFromLocation() ?? videos[0].id
+  loadVideo(startId)
+
+  // Legacy ?v=N address → tidy it to the project URL without adding history.
+  if (window.location.pathname.endsWith('work.html') && window.location.search) {
+    const v = videos.find(x => x.id === startId)
+    if (v && idFromLocation() !== null) history.replaceState({ videoId: startId }, '', v.url)
+  }
 }
 
 init()
 
-window.addEventListener('popstate', e => {
-  if (e.state && e.state.videoId) loadVideo(e.state.videoId)
+window.addEventListener('popstate', () => {
+  loadVideo(idFromLocation() ?? videos[0].id, { push: false })
 })

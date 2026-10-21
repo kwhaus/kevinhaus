@@ -60,12 +60,14 @@ document.addEventListener('DOMContentLoaded', () => {
   let pool           = orderedPool()
   let currentIndex   = 0
   let currentVideoId = pool[0].videoId
+  let currentVideoUrl = pool[0].url
   let cycleTimer     = null
 
   // ── SHOW STILL ─────────────────────────────────────────────────────────────
   function showStill(index) {
     const item = pool[index % pool.length]
     currentVideoId = item.videoId
+    currentVideoUrl = item.url
     stillImg.src = item.src
     stillImg.alt = item.videoTitle
     preload(pool[(index + 1) % pool.length].src)
@@ -89,7 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   stillWrap.addEventListener('click', () => {
     if (!isDragging && currentVideoId !== null) {
-      window.location.href = `/work.html?v=${currentVideoId}`
+      window.location.href = currentVideoUrl || '/work.html'
     }
   })
 
