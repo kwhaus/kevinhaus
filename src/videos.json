@@ -2,9 +2,10 @@
   {
     "id": 1,
     "title": "Nothing - Purple Strings",
-    "artist": "Nothing",
-    "song": "Purple Strings",
+    "client": "Nothing",
+    "project": "Purple Strings",
     "type": "music video",
+    "date": "2025-12-08",
     "assetId": "CVIR6Mysh6QzOFV9NZTqcW4Coe9vNTIp00v5wnX01L02oI",
     "playbackId": "VaoVoaAfxBkAnMHcjMeh36WvzDeSBJONgXsz44SQYwc",
     "coverImage": "cover_PurpleStrings.webp",
@@ -25,14 +26,17 @@
       "purplestrings13.webp",
       "purplestrings14.webp"
     ],
+    "featuredStills": ["purplestrings01.webp"],
+    "heroStill": true,
     "showInPortfolio": true
   },
   {
     "id": 2,
     "title": "Nothing - Eaten by Worms",
-    "artist": "Nothing",
-    "song": "Eaten by Worms",
+    "client": "Nothing",
+    "project": "Eaten by Worms",
     "type": "music video",
+    "date": "2016-03-29",
     "assetId": "ZOQGvQnDAD6KoKZMNNaCkOb602W6yXo159wXaNHuJ8Dc",
     "playbackId": "2MoGPMZ8huGsB00UQ1fWxwcO3ejLvmAVC4U7ADtQseuM",
     "coverImage": "cover_eatenbyworms.webp",
@@ -47,14 +51,16 @@
       "eatenbyworms07.webp",
       "eatenbyworms08.webp"
     ],
+    "featuredStills": ["eatenbyworms04.webp"],
     "showInPortfolio": true
   },
   {
     "id": 3,
     "title": "Nothing - Zero Day",
-    "artist": "Nothing",
-    "song": "Zero Day",
+    "client": "Nothing",
+    "project": "Zero Day",
     "type": "music video",
+    "date": "2018-06-05",
     "assetId": "cqr019Ar1n3eL1zruGJWKXa8bg2ynIOSeLEA84uf1tY00",
     "playbackId": "s2MbShTf7jh01ZlGXFsnklJTrfdatk006yK44dydIiAHE",
     "coverImage": "cover_ZeroDay.webp",
@@ -69,14 +75,16 @@
       "zeroday07.webp",
       "zeroday08.webp"
     ],
+    "featuredStills": ["zeroday06.webp"],
     "showInPortfolio": true
   },
   {
     "id": 4,
     "title": "Nothing - Something in the Way",
-    "artist": "Nothing",
-    "song": "Something in the Way",
+    "client": "Nothing",
+    "project": "Something in the Way",
     "type": "music video",
+    "date": "2015-07-09",
     "assetId": "tZHdLPlkeOlGVeppbbpmjoFe6gAkijo5swGCFK01Svtc",
     "playbackId": "B01cz63RVfQSzB01IBm00KV8T6akPDD00V4jZLeRmqh26JU",
     "coverImage": "cover_somethingintheway.webp",
@@ -86,14 +94,16 @@
       "somethingintheWay02.webp",
       "somethingintheWay03.webp"
     ],
+    "featuredStills": [],
     "showInPortfolio": true
   },
   {
     "id": 5,
     "title": "The Warhawks - Slow You",
-    "artist": "The Warhawks",
-    "song": "Slow You",
+    "client": "The Warhawks",
+    "project": "Slow You",
     "type": "music video",
+    "date": "2024-10-11",
     "assetId": "Eu5vHNZeLnk1MyM00eSV017U02Dwq4kj1r02mOa017CQjaU00",
     "playbackId": "Z1ma5m1Ha9cq00H02vpPXaUzoNpSIdVUUdweAmtloWgr8",
     "coverImage": "cover_SlowYou.webp",
@@ -106,14 +116,18 @@
       "slowyou05.webp",
       "slowyou06.webp"
     ],
-    "showInPortfolio": true
+    "featuredStills": ["slowyou04.webp"],
+    "showInPortfolio": true,
+    "festivals": ["Hollywood Music Video Awards"],
+    "awards": ["Nominated, Best Low Budget and Best Indie"]
   },
   {
     "id": 6,
     "title": "The Menzingers - Bad Catholics",
-    "artist": "The Menzingers",
-    "song": "Bad Catholics",
+    "client": "The Menzingers",
+    "project": "Bad Catholics",
     "type": "music video",
+    "date": "2016-11-15",
     "assetId": "a9FQsdpx7cBR2uxSM5kg7n00Ujo4X46YN8iyaGUV48jo",
     "playbackId": "301pAyCw01rQBr5izhLVaV02J55zOM010100BTec017ERpR3yc",
     "coverImage": "cover_BadCatholics.webp",
@@ -126,14 +140,16 @@
       "badCatholics05.webp",
       "badCatholics06.webp"
     ],
+    "featuredStills": [],
     "showInPortfolio": true
   },
   {
     "id": 7,
     "title": "USA BMX - Like a Champion",
-    "artist": "USA BMX",
-    "song": "Like a Champion",
+    "client": "USA BMX",
+    "project": "Like a Champion",
     "type": "branded content",
+    "date": "2016",
     "assetId": "amtqikUuN7Zm02eUOqqNrDTeoWnY00kmvzWMhGmhJl5XI",
     "playbackId": "f00jddCaaYkQVg1cOIGk3e1QQJFOTscl016fZtun202nuc",
     "coverImage": "cover_usaBMX.webp",
@@ -143,14 +159,16 @@
       "usaBMX02.webp",
       "usaBMX03.webp"
     ],
+    "featuredStills": [],
     "showInPortfolio": true
   },
   {
     "id": 8,
     "title": "New Miserable Experience - Philosophy on Pessimism",
-    "artist": "New Miserable Experience",
-    "song": "Philosophy on Pessimism",
+    "client": "New Miserable Experience",
+    "project": "Philosophy on Pessimism",
     "type": "music video",
+    "date": "2022-12-16",
     "assetId": "pmEmMRaXE43qsLTH3700bk1f02Ie69kctLVGmr02M7dvPA",
     "playbackId": "Ek02J2ASu61DSxOHsnbjVb5d4762vMrxzt9TJeagkQEA",
     "coverImage": "cover_Pessimism.webp",
@@ -161,14 +179,17 @@
       "pessimism03.webp",
       "pessimism04.webp"
     ],
+    "featuredStills": ["pessimism01.webp"],
     "showInPortfolio": true
   },
   {
     "id": 9,
     "title": "Johnson & Johnson - Reverse the Course",
-    "artist": "Johnson & Johnson",
-    "song": "Reverse the Course",
+    "client": "Johnson & Johnson",
+    "agency": "MMC",
+    "project": "Reverse the Course",
     "type": "commercial",
+    "date": "2019",
     "assetId": "024jXKgchc02pq4AwXorKPxGtO6oOtYYMNumCnNiCgvio",
     "playbackId": "012Zgxg8QtVKGIhc5vCqoczju3gDpsv4pBf1DwqtmKxc",
     "coverImage": "cover_reverse.webp",
@@ -179,14 +200,16 @@
       "reverse03.webp",
       "reverse04.webp"
     ],
+    "featuredStills": [],
     "showInPortfolio": true
   },
   {
     "id": 10,
     "title": "Death of Lovers - Orphans of the Smog",
-    "artist": "Death of Lovers",
-    "song": "Orphans of the Smog",
+    "client": "Death of Lovers",
+    "project": "Orphans of the Smog",
     "type": "music video",
+    "date": "2017-11-20",
     "assetId": "pzs6sUVn18Jeoa6vDJM54VQvfVPr6SBSaWR5VLJI1t4",
     "playbackId": "CRca7P2GnIqXaxx5V29gr017SzUZA0202HPjh1P01YsqKvw",
     "coverImage": "cover_orphans.webp",
@@ -194,14 +217,15 @@
     "stills": [
       "orphans01.webp"
     ],
+    "featuredStills": [],
     "showInPortfolio": true
   },
   {
     "id": 11,
     "title": "The Wreck",
-    "artist": "The Wreck",
-    "song": "",
+    "project": "The Wreck",
     "type": "short film",
+    "date": "2014-05-17",
     "assetId": "3mNI00PfNBUe2GsHCOf2j1lGyMdQjT1OPivT7SKSs8mg",
     "playbackId": "UsjrR2PeW4L3BH4bryOlUQf1PQJR3byhgjIWexHYbrg",
     "coverImage": "cover_TheWreck.webp",
@@ -214,14 +238,27 @@
       "theWreck05.webp",
       "theWreck06.webp"
     ],
-    "showInPortfolio": true
+    "featuredStills": ["theWreck06.webp"],
+    "showInPortfolio": true,
+    "festivals": ["Cannes Court Métrage Cannes, France", 
+    "NY Int’l Short Film Festival - World Premiere, New York, NY", 
+    "Manhattan Film Festival, New York, NY", 
+    "Hawaii Int’l Short Film Festival, Hawaii",
+    "NewFilmmakers NY, New York, NY", 
+    "Int’l Psychoanalysis and Film Festival, Bucharest, Romania", 
+    "Richmond Int’l Film Festival, Richmond, VA"
+    ],
+    "awards": ["Winner Best Art Short - Manhattan Film Festival"],
+    "note": "Short of the Week: 'A unique and poetic cinematic voice.'"
   },
   {
     "id": 12,
-    "title": "Sunoco - Worlds Fastest Fillup",
-    "artist": "Sunoco",
-    "song": "Worlds Fastest Fillup",
+    "title": "Sunoco - World's Fastest Fillup",
+    "client": "Sunoco",
+    "agency": "McKinney",
+    "project": "World's Fastest Fillup",
     "type": "commercial",
+    "date": "2018-11-13",
     "assetId": "85qRrfI0265shvWkFxcGCVNm5fPWE7vu8eBlCb8gWAJE",
     "playbackId": "eUXxTxuuqtDbOz3uTS01zAEgpqHUwjlU01suGhJWAMlpE",
     "coverImage": "cover_Sunoco.webp",
@@ -229,14 +266,18 @@
     "stills": [
       "sunoco01.webp"
     ],
-    "showInPortfolio": true
+    "featuredStills": [],
+    "showInPortfolio": true,
+    "festivals": ["Ex Awards"],
+    "awards":  ["Winner Best PR Stunt, Las Vegas, NV"]
   },
   {
     "id": 13,
     "title": "King Woman - Deny",
-    "artist": "King Woman",
-    "song": "Deny",
+    "client": "King Woman",
+    "project": "Deny",
     "type": "music video",
+    "date": "2017-01-25",
     "assetId": "BoPZzHluueGfE02LLrB01vUzpgOVeJ2VAylmCPFcHKUDU",
     "playbackId": "Kq01uAASz02ViHflJfoiZ4spuQaKpHzlHgH00015aYJq2aM",
     "coverImage": "cover_Deny.webp",
@@ -251,13 +292,14 @@
       "deny07.webp",
       "deny08.webp"
     ],
+    "featuredStills": [],
     "showInPortfolio": true
   },
   {
     "id": 14,
     "title": "Reel - Comedy",
-    "artist": "Kevin Haus",
-    "song": "",
+    "client": "Kevin Haus",
+    "project": "",
     "type": "reel",
     "assetId": "9VZUAuJIOTrfGL4z00Lrqfnb4GSCWfgi02sA8W1hZe5s8",
     "playbackId": "E8BtqzaXAVTVqj7ck02018kcOaYJDco8398KL00C3BdfwI",
@@ -269,61 +311,68 @@
   {
     "id": 15,
     "title": "Reel - Kids",
-    "artist": "Kevin Haus",
-    "song": "",
+    "client": "Kevin Haus",
+    "project": "",
     "type": "reel",
     "assetId": "QIGXGL3NFFrj42RTsOHxyikLBLedNYExh7eQkebhUkk",
     "playbackId": "8G2kS3I00T1u01iwHbwvnhHL9pQ1qRfbtR00EFLn02ht2jE",
     "coverImage": "cover_ReelKids.webp",
     "aspectRatio": "16:9",
     "stills": [],
+    "featuredStills": [],
     "showInPortfolio": false
   },
   {
     "id": 16,
     "title": "Reel - Lifestyle",
-    "artist": "Kevin Haus",
-    "song": "",
+    "client": "Kevin Haus",
+    "project": "",
     "type": "reel",
     "assetId": "Tpgv7O6jj5AiaGSzE46009JV33II96FrGa02xACN01B4ww",
     "playbackId": "6SgufRt0100NevTMs1S2ty9BPB00zKWDt6kZMwsRXIpgCw",
     "coverImage": "cover_ReelLifestyle.webp",
     "aspectRatio": "16:9",
     "stills": [],
+    "featuredStills": [],
     "showInPortfolio": false
   },
   {
     "id": 17,
     "title": "Metavivor x AnaOno",
-    "artist": "Metavivor",
-    "song": "AnaOno",
+    "client": "Metavivor",
+    "project": "AnaOno",
     "type": "branded content",
+    "date": "2020-01-20",
     "assetId": "it9Iazq1JLCjxewbQRItZ02vSOkPp8ANqibWLK1WrQi8",
     "playbackId": "MooQH8e3wl8XkXVOoMV2WkH02eIr83DXAaFOlBcucq5M",
     "coverImage": "cover_anaono.webp",
     "aspectRatio": "16:9",
     "stills": [],
-    "showInPortfolio": false
+    "featuredStills": [],
+    "showInPortfolio": true
   },
   {
     "id": 18,
     "title": "Not Just One - A Metastatic Breast Cancer Documentary",
-    "artist": "Allergan",
-    "song": "",
+    "client": "Allergan",
+    "project": "A Metastatic Breast Cancer Documentary",
     "type": "branded content",
+    "date": "2020-04-20",
     "assetId": "01CCJ02z7IIMrXNw9qdPJAcnC00bXG02GVVvj1znAkMiMpw",
     "playbackId": "lKBl2y9jERduqnFo02nNRSMfpSWYJJUnCFMXwu8xjoVo",
     "coverImage": "cover_notjustone.webp",
     "aspectRatio": "16:9",
     "stills": [],
+    "featuredStills": [],
     "showInPortfolio": false
   },
   {
     "id": 19,
     "title": "Lewis & Clarke - A Map of a Maze",
-    "artist": "Lewis & Clarke",
-    "song": "A Map of a Maze",
+    "client": "Lewis & Clarke",
+    "project": "A Map of a Maze",
     "type": "music video",
+    "date": "2014-06-10",
     "assetId": "oViymXJzsmq0101Z01Ac6gMcPphtqwERC35olKlznDC178",
     "playbackId": "sPLT9YnJVI5j64nv01tGC9eWyFHUpulJOse9xZia5JpY",
     "coverImage": "cover_amapofamaze.webp",
@@ -333,25 +382,41 @@
       "mapofamaze02.webp",
       "mapofamaze03.webp"
     ],
+    "featuredStills": [],
     "showInPortfolio": true
   },
   {
     "id": 20,
     "title": "Vans x Stoked",
-    "artist": "Vans x Stoked",
-    "song": "",
+    "client": "Vans x Stoked",
+    "project": "We Live Here",
     "type": "branded content",
+    "date": "2018",
     "assetId": "2QZDgVCOqd8Eq8Q7D9tjdMAP7Ym6aT5DmRu3faRchdE",
     "playbackId": "602G00MkUILB5cpzl1vSTM00bSI8E9W3So5XZ01HLP33bcg",
     "coverImage": "cover_vansxstoked.webp",
     "aspectRatio": "12:5",
-    "stills": [
-      "mapofamaze01.webp",
-      "mapofamaze02.webp",
-      "mapofamaze03.webp"
-    ],
+    "stills": [],
+    "featuredStills": [],
+    "showInPortfolio": true
+  },
+  {
+    "id": 21,
+    "title": "Pynuka - Burn (Club Mix)",
+    "client": "Pynuka",
+    "project": "Burn",
+    "type": "music video",
+    "date": "2023-09-22",
+    "assetId": "kteVh6EzSObRxqtD9MOLoAnBgDzxy178EwfAFUjq02ZI",
+    "playbackId": "CxkTGXgVgPucXIjQUVfEBJM5vrwOXBy9dUUcN15E8Bw",
+    "coverImage": "cover_PynukaBurn.webp",
+    "aspectRatio": "12:5",
+    "stills": [],
+    "featuredStills": [],
     "showInPortfolio": false
   }
+
+
 
 
 ]  

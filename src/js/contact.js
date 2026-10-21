@@ -1,2 +1,5 @@
 import navHtml from '../pages/nav.html?raw'
-document.getElementById('kh-nav-mount').innerHTML = navHtml
+
+// ── INJECT NAV ────────────────────────────────────────────────────────────────
+const navMount = document.getElementById('kh-nav-mount')
+if (navMount && !navMount.innerHTML.trim()) navMount.innerHTML = navHtml

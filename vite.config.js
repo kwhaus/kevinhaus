@@ -2,6 +2,7 @@ import { resolve, dirname } from 'path'
 import { fileURLToPath } from 'url'
 import { defineConfig } from 'vite'
 import purgecss from 'vite-plugin-purgecss'
+import prerender from './build/prerender.js'          // ← NEW
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
@@ -12,15 +13,14 @@ export default defineConfig({
   publicDir: resolve(__dirname, 'public'),
 
   plugins: [
+    prerender(),                                       // ← NEW (must come before purgecss)
     purgecss({
       content: [
         resolve(__dirname, 'src/**/*.html'),
         resolve(__dirname, 'src/**/*.js'),
       ],
-      // Safelist patterns — never purge these even if not found in static scan
       safelist: {
         standard: [
-          // Bootstrap JS-driven classes
           /^show$/,
           /^collaps/,
           /^offcanvas/,
@@ -28,11 +28,12 @@ export default defineConfig({
           /^dropdown/,
           /^fade$/,
           /^active$/,
-          // Theme switching
           /^data-bs-theme/,
+          // Prerendered playlist classes — generated at build time, so the
+          // static scan of src/ won't always see them.
+          /^kh-playlist/,                               // ← NEW
         ],
         deep: [
-          // Dynamic classes added by JS
           /dragging/,
           /drag-over/,
           /fading/,

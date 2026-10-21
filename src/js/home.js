@@ -3,7 +3,7 @@ import navHtml from '../pages/nav.html?raw'
 
 // ── INJECT NAV ────────────────────────────────────────────────────────────────
 const navMount = document.getElementById('kh-nav-mount')
-if (navMount) navMount.innerHTML = navHtml
+if (navMount && !navMount.innerHTML.trim()) navMount.innerHTML = navHtml
 
 // ── SHUFFLE ───────────────────────────────────────────────────────────────────
 function shuffle(arr) {
@@ -20,57 +20,46 @@ function preload(src) {
   img.src = src
 }
 
+// ── READ PRERENDERED DATA ─────────────────────────────────────────────────────
+// build/prerender.js bakes both of these into index.html. No fetch, so the first
+// still is already painting while this module parses.
+function readJson(id) {
+  const el = document.getElementById(id)
+  if (!el) return null
+  try {
+    return JSON.parse(el.textContent)
+  } catch (err) {
+    console.error(`Could not parse #${id}:`, err)
+    return null
+  }
+}
+
 // ── INIT ──────────────────────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener('DOMContentLoaded', () => {
 
   const stillImg  = document.getElementById('stillImg')
   const stillWrap = document.getElementById('stillWrap')
   if (!stillWrap || !stillImg) return
 
-  // ── FETCH VIDEOS ───────────────────────────────────────────────────────────
-  let videoData = []
-  try {
-    const res = await fetch('/.netlify/functions/get-videos')
-    const data = await res.json()
-    videoData = Array.isArray(data) ? data : []
-
-    // Fall back to bundled JSON if Blobs is empty
-    if (videoData.length === 0) {
-      const fallback = await import('../videos.json')
-      videoData = fallback.default || []
-    }
-  } catch {
-    // Fall back to bundled JSON on any network error
-    try {
-      const fallback = await import('../videos.json')
-      videoData = fallback.default || []
-    } catch { videoData = [] }
-  }
-
-  // ── BUILD STILL POOL ───────────────────────────────────────────────────────
-  // Only use stills from portfolio videos on the home page
-  const portfolioVideos = videoData.filter(v => v.showInPortfolio !== false)
-  const stillPool = []
-  portfolioVideos.forEach(video => {
-    if (video.stills && video.stills.length > 0) {
-      video.stills.forEach(filename => {
-        stillPool.push({
-          src: `${config.assetsBase}/Stills/${filename}`,
-          videoId: video.id,
-          videoTitle: video.title,
-        })
-      })
-    }
-  })
+  const stillPool = readJson('kh-stills') || []
+  const hero      = readJson('kh-hero')
 
   if (stillPool.length === 0) {
     stillWrap.style.display = 'none'
     return
   }
 
-  let pool           = shuffle(stillPool)
+  // Start from the still already in the HTML, then shuffle the remainder — so
+  // there's no swap on load, but the cycle is still randomised.
+  function orderedPool() {
+    if (!hero) return shuffle(stillPool)
+    const rest = stillPool.filter(s => s.src !== hero.src)
+    return [hero, ...shuffle(rest)]
+  }
+
+  let pool           = orderedPool()
   let currentIndex   = 0
-  let currentVideoId = null
+  let currentVideoId = pool[0].videoId
   let cycleTimer     = null
 
   // ── SHOW STILL ─────────────────────────────────────────────────────────────
@@ -92,11 +81,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   function resetCycle() {
     clearInterval(cycleTimer)
-    cycleTimer = setInterval(() => goTo(1), config.stillHoldTime)
-  }
-
-  function startCycle() {
-    showStill(currentIndex)
     cycleTimer = setInterval(() => goTo(1), config.stillHoldTime)
   }
 
@@ -173,17 +157,19 @@ document.addEventListener('DOMContentLoaded', async () => {
   })
 
   // ── START ──────────────────────────────────────────────────────────────────
-  // Show the first still, then signal main.js once it has actually loaded
-  // so the preloader isn't dismissed before the image is visible.
-  showStill(currentIndex)
+  // Don't call showStill(0) — the hero is already in the HTML and reassigning
+  // src would discard an in-flight fetch. Just warm the neighbours.
+  preload(pool[1 % pool.length].src)
+  preload(pool[pool.length - 1].src)
   cycleTimer = setInterval(() => goTo(1), config.stillHoldTime)
 
+  // Signal main.js to dismiss the preloader once the still is actually visible.
   const signalReady = () => document.dispatchEvent(new CustomEvent('kh:first-still-loaded'))
   if (stillImg.complete && stillImg.naturalWidth > 0) {
     signalReady()
   } else {
     stillImg.addEventListener('load',  signalReady, { once: true })
-    stillImg.addEventListener('error', signalReady, { once: true }) // fail-safe
+    stillImg.addEventListener('error', signalReady, { once: true })
   }
 
 })

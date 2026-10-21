@@ -1,8 +1,8 @@
 import { getStore } from '@netlify/blobs'
 
 // ── SAVE REEL ─────────────────────────────────────────────────────────────────
-// Password-protected. Saves a reel config to Netlify Blobs.
-// Also handles listing all reels (GET) and deleting a reel (DELETE).
+// Password-protected for EVERY method (list, save, delete).
+// Clients view reels through get-reel, which is public by design.
 
 export default async (req, context) => {
 
@@ -18,16 +18,14 @@ export default async (req, context) => {
     })
   }
 
-  // Auth check for all methods except GET
-  if (req.method !== 'GET') {
-    const password  = req.headers.get('X-Admin-Password')
-    const adminPass = process.env.ADMIN_PASSWORD
-    if (!adminPass || password !== adminPass) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-        status: 401,
-        headers: { 'Content-Type': 'application/json' },
-      })
-    }
+  // Auth check for every method
+  const password  = req.headers.get('X-Admin-Password')
+  const adminPass = process.env.ADMIN_PASSWORD
+  if (!adminPass || password !== adminPass) {
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      status: 401,
+      headers: { 'Content-Type': 'application/json' },
+    })
   }
 
   const store = getStore('reels')

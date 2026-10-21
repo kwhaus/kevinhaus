@@ -1,16 +1,25 @@
 import config from './site.config.js'
 import navHtml from '../pages/nav.html?raw'
-import bundledVideos from '../videos.json'
 
-// ── INJECT NAV ────────────────────────────────────────────────────────────────
-document.getElementById('kh-nav-mount').innerHTML = navHtml
+// ── NAV ───────────────────────────────────────────────────────────────────────
+// The build prerenders the nav into every page. This only fires in dev, or if
+// the prerender ever fails — it prevents a double-injected nav in production.
+// Apply this same guard in home.js / about.js / contact.js / reel.js.
+const navMount = document.getElementById('kh-nav-mount')
+if (navMount && !navMount.innerHTML.trim()) navMount.innerHTML = navHtml
 
-// ── ROMAN NUMERALS ────────────────────────────────────────────────────────────
-const ROMAN = ['I','II','III','IV','V','VI','VII','VIII','IX','X',
-               'XI','XII','XIII','XIV','XV','XVI','XVII','XVIII','XIX','XX']
-
-function toRoman(n) {
-  return ROMAN[n - 1] || String(n)
+// ── VIDEO DATA ────────────────────────────────────────────────────────────────
+// Baked into the HTML at build time by build/prerender.js. No fetch, no flash of
+// empty playlist, and the markup is in the source for crawlers.
+function readVideos() {
+  const el = document.getElementById('kh-videos')
+  if (!el) return []
+  try {
+    return JSON.parse(el.textContent)
+  } catch (err) {
+    console.error('Could not parse embedded video data:', err)
+    return []
+  }
 }
 
 // ── POSTER URL ────────────────────────────────────────────────────────────────
@@ -22,43 +31,11 @@ function getPosterUrl(video) {
   return `https://image.mux.com/${video.playbackId}/thumbnail.webp?time=${time}&width=1280`
 }
 
-// ── PRELOAD ALL COVERS ────────────────────────────────────────────────────────
 function preloadAllCovers(videos) {
   videos.forEach(video => {
     const img = new Image()
     img.src = getPosterUrl(video)
   })
-}
-
-// ── STRUCTURED DATA ───────────────────────────────────────────────────────────
-function injectVideoSchema(videos) {
-  const schema = {
-    "@context": "https://schema.org",
-    "@type": "ItemList",
-    "name": "Work by Kevin Haus",
-    "description": "Music videos, commercials, and branded content directed by Kevin Haus.",
-    "url": "https://kevinhaus.com/work.html",
-    "itemListElement": videos.map((video, index) => ({
-      "@type": "ListItem",
-      "position": index + 1,
-      "item": {
-        "@type": "VideoObject",
-        "name": video.title,
-        "description": `${video.title} — ${video.type} directed by Kevin Haus.`,
-        "thumbnailUrl": `https://image.mux.com/${video.playbackId}/thumbnail.webp?time=3&width=640`,
-        "uploadDate": "2024-01-01",
-        "director": {
-          "@type": "Person",
-          "name": "Kevin Haus",
-          "url": "https://kevinhaus.com"
-        }
-      }
-    }))
-  }
-  const script = document.createElement('script')
-  script.type = 'application/ld+json'
-  script.textContent = JSON.stringify(schema)
-  document.head.appendChild(script)
 }
 
 // ── DOM REFS ──────────────────────────────────────────────────────────────────
@@ -68,25 +45,21 @@ const playlist    = document.getElementById('playlist')
 
 // ── STATE ─────────────────────────────────────────────────────────────────────
 let activeId = null
-let videos   = []
+const videos = readVideos()
 
 // ── LOAD VIDEO ────────────────────────────────────────────────────────────────
-const FADE_MS = 250 // ~6 frames out, ~6 frames in
+const FADE_MS = 250
 
 function loadVideo(id) {
   const video = videos.find(v => v.id === id)
   if (!video) return
 
-  // First load — no transition, just set immediately
   if (activeId === null) {
     applyVideo(id, video)
     return
   }
-
-  // Already showing this video — do nothing
   if (activeId === id) return
 
-  // Fade out -> swap -> fade in
   playerSizer.classList.add('kh-player-fading')
   setTimeout(() => {
     applyVideo(id, video)
@@ -97,16 +70,14 @@ function loadVideo(id) {
 function applyVideo(id, video) {
   activeId = id
 
-  const posterUrl = getPosterUrl(video)
-  player.setAttribute('poster', posterUrl)
+  player.setAttribute('poster', getPosterUrl(video))
   player.setAttribute('playback-id', video.playbackId)
   player.setAttribute('metadata-video-title', video.title)
 
   window.scrollTo({ top: 0, behavior: 'smooth' })
 
   document.querySelectorAll('.kh-playlist-link').forEach(btn => {
-    const isActive = parseInt(btn.dataset.id) === id
-    btn.classList.toggle('active', isActive)
+    btn.classList.toggle('active', parseInt(btn.dataset.id, 10) === id)
   })
 
   const url = new URL(window.location)
@@ -114,72 +85,32 @@ function applyVideo(id, video) {
   history.pushState({ videoId: id }, '', url)
 }
 
-// ── BUILD PLAYLIST ────────────────────────────────────────────────────────────
-function buildPlaylist() {
-  playlist.innerHTML = ''
-
-  videos.forEach((video, index) => {
-    const li  = document.createElement('li')
-    li.className = 'kh-playlist-item'
-
-    const btn = document.createElement('button')
-    btn.className   = 'kh-playlist-link'
-    btn.dataset.id  = video.id
-    btn.type        = 'button'
-    btn.innerHTML   = `${toRoman(index + 1)}.&nbsp;&nbsp;${video.title}`
-    btn.addEventListener('click', () => loadVideo(video.id))
-
-    li.appendChild(btn)
-    playlist.appendChild(li)
+// ── HYDRATE ───────────────────────────────────────────────────────────────────
+// The <li> elements already exist in the HTML. Attach behaviour, don't rebuild.
+function hydratePlaylist() {
+  playlist.addEventListener('click', e => {
+    const btn = e.target.closest('.kh-playlist-link')
+    if (!btn) return
+    loadVideo(parseInt(btn.dataset.id, 10))
   })
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
-async function init() {
-  try {
-    // Show loading state in playlist
-    playlist.innerHTML = '<li style="opacity:0.4; padding: 0.5rem 0;">Loading...</li>'
-
-    const res  = await fetch('/.netlify/functions/get-videos')
-    const all  = res.ok ? (await res.json().catch(() => [])) : []
-
-    // Fall back to bundled JSON if Blobs is empty or function unavailable
-    const source = all.length > 0 ? all : bundledVideos || []
-
-    // Work page only shows portfolio videos
-    // Videos without showInPortfolio field default to true (backward compat)
-    videos = source.filter(v => v.showInPortfolio !== false)
-
-    buildPlaylist()
-    preloadAllCovers(videos)
-    injectVideoSchema(videos)
-
-    const params  = new URLSearchParams(window.location.search)
-    const paramId = parseInt(params.get('v'))
-
-    if (paramId && videos.find(v => v.id === paramId)) {
-      loadVideo(paramId)
-    } else {
-      loadVideo(videos[0].id)
-    }
-
-  } catch (err) {
-    console.error('work.js init error:', err)
-    // Static import is always available — use it directly
-    videos = (bundledVideos || []).filter(v => v.showInPortfolio !== false)
-    if (videos.length > 0) {
-      buildPlaylist()
-      preloadAllCovers(videos)
-      loadVideo(videos[0].id)
-    } else {
-      playlist.innerHTML = '<li style="color:red;">Failed to load videos</li>'
-    }
+function init() {
+  if (videos.length === 0) {
+    console.error('No video data found in page.')
+    return
   }
+
+  hydratePlaylist()
+  preloadAllCovers(videos)
+
+  const paramId = parseInt(new URLSearchParams(window.location.search).get('v'), 10)
+  loadVideo(videos.find(v => v.id === paramId) ? paramId : videos[0].id)
 }
 
 init()
 
-// Handle browser back/forward
-window.addEventListener('popstate', (e) => {
+window.addEventListener('popstate', e => {
   if (e.state && e.state.videoId) loadVideo(e.state.videoId)
 })

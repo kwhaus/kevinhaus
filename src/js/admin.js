@@ -1,5 +1,4 @@
 import videosData from '../videos.json'
-import config from './site.config.js'
 import navHtml from '../pages/nav.html?raw'
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -23,50 +22,52 @@ document.addEventListener('DOMContentLoaded', async () => {
   let videoList = []
   let adminPassword = ''
 
+  // ── SERVER-SIDE PASSWORD CHECK ──────────────────────────────────────────────
+  // The password is only ever compared on the server (admin-login function).
+  async function verify(password) {
+    try {
+      const res = await fetch('/.netlify/functions/admin-login', {
+        method: 'POST',
+        headers: { 'X-Admin-Password': password },
+      })
+      return res.ok
+    } catch {
+      return false
+    }
+  }
+
   // ── AUTO-LOGIN FROM SESSION ─────────────────────────────────────────────────
-  function checkSession() {
+  async function checkSession() {
     try {
       const session = sessionStorage.getItem('kh-admin-session')
       if (!session) return false
-      
       const { password, expiry } = JSON.parse(session)
-      
-      // Check if session has expired (4 hours = 14400000 ms)
       if (Date.now() > expiry) {
         sessionStorage.removeItem('kh-admin-session')
         return false
       }
-      
-      // Verify password still matches
-      if (password === config.adminPassword) {
+      if (await verify(password)) {
         adminPassword = password
         return true
       }
-    } catch {
-      sessionStorage.removeItem('kh-admin-session')
-    }
+    } catch { /* fall through */ }
+    sessionStorage.removeItem('kh-admin-session')
     return false
   }
 
-  // Auto-login if valid session exists
-  if (checkSession()) {
+  if (await checkSession()) {
     loginDiv.style.display = 'none'
     panelDiv.style.display = 'block'
     loadVideos()
   }
 
   // ── LOGIN ────────────────────────────────────────────────────────────────────
-  function tryLogin() {
-    if (pwInput.value === config.adminPassword) {
-      adminPassword = pwInput.value
-      
-      // Store session (expires in 4 hours)
+  async function tryLogin() {
+    const attempt = pwInput.value
+    if (await verify(attempt)) {
+      adminPassword = attempt
       const expiry = Date.now() + (4 * 60 * 60 * 1000)
-      sessionStorage.setItem('kh-admin-session', JSON.stringify({
-        password: adminPassword,
-        expiry
-      }))
-      
+      sessionStorage.setItem('kh-admin-session', JSON.stringify({ password: attempt, expiry }))
       loginDiv.style.display = 'none'
       panelDiv.style.display = 'block'
       loadVideos()
@@ -116,6 +117,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     buildList()
     buildReelPicker()
+    // Reels are now password-protected, so they load only after login.
+    loadReels()
   }
 
   // ── SAVE VIDEOS TO BLOBS ─────────────────────────────────────────────────────
@@ -316,11 +319,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     })
   }
 
-  // Load existing reels
+  // Load existing reels (password required — the list is private)
   async function loadReels() {
     if (!reelsList) return
     try {
-      const res   = await fetch('/.netlify/functions/save-reel')
+      const res = await fetch('/.netlify/functions/save-reel', {
+        headers: { 'X-Admin-Password': adminPassword },
+      })
+      if (!res.ok) throw new Error('Unauthorized')
       const reels = await res.json()
 
       if (!reels.length) {
@@ -476,7 +482,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     })
   }
 
-  // Load reels when panel loads
-  loadReels()
+  // NOTE: loadReels() is called from loadVideos() after login, not here —
+  // the reel list requires the admin password.
 
 })
