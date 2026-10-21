@@ -238,13 +238,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     { key: 'slug',         label: 'URL slug (blank = from title; changing it changes the page URL)', half: true },
     { key: 'playbackId',   label: 'Mux playback ID',             half: true, required: true },
     { key: 'assetId',      label: 'Mux asset ID',                half: true },
-    { key: 'coverImage',   label: 'Cover image filename',        half: true },
+    { key: 'coverImage',   label: 'Cover image filename (assets/Covers/)', half: true },
+    { key: 'thumbnailTime', label: 'Thumbnail frame, seconds (used when there is no cover image)', half: true, number: true },
     { key: 'stills',       label: 'Stills — filenames, one per line (project page gallery)', list: true },
     { key: 'featuredStills', label: 'Home-page stills — one per line (blank = use all stills)', list: true },
     { key: 'festivals',    label: 'Festivals / premieres — one per line', list: true },
     { key: 'awards',       label: 'Awards — one per line',       list: true },
     { key: 'note',         label: 'Press quote / note',          area: true },
     { key: 'btsPlaybackId', label: 'Behind-the-scenes video — Mux playback ID', half: true },
+    { key: 'btsCoverImage', label: 'BTS video cover image filename (assets/Covers/)', half: true },
+    { key: 'btsThumbnailTime', label: 'BTS video thumbnail frame, seconds (if no cover image)', half: true, number: true },
     { key: 'btsPhotos',    label: 'BTS photos — filenames in assets/BTS/<slug>/, one per line (blank = use every image in that folder)', list: true },
   ]
 
@@ -316,7 +319,10 @@ document.addEventListener('DOMContentLoaded', async () => {
           if (items.length) next[f.key] = items; else delete next[f.key]
         } else {
           const val = raw.trim()
-          if (val) next[f.key] = val
+          if (val && f.number) {
+            const n = Number(val)
+            if (Number.isFinite(n) && n >= 0) next[f.key] = n; else delete next[f.key]
+          } else if (val) next[f.key] = val
           else if (f.required || f.key === 'title') next[f.key] = ''
           else delete next[f.key]
         }

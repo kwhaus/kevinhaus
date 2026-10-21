@@ -293,11 +293,21 @@ function btsFor(v) {
   return { photos, playbackId: v.btsPlaybackId || '' }
 }
 
+// Poster for the BTS video: a cover file (btsCoverImage, in assets/Covers/) or a
+// frame of the video (btsThumbnailTime, seconds). Neither → Mux's default frame.
+function btsPoster(v) {
+  if (v.btsCoverImage) return ` poster="${ASSETS_BASE}/Covers/${esc(v.btsCoverImage)}"`
+  if (v.btsThumbnailTime != null && v.btsThumbnailTime !== '') {
+    return ` poster="https://image.mux.com/${esc(v.btsPlaybackId)}/thumbnail.webp?time=${esc(v.btsThumbnailTime)}&amp;width=1280"`
+  }
+  return ''
+}
+
 function btsHtml(v) {
   const { photos, playbackId } = btsFor(v)
   if (!photos.length && !playbackId) return ''
   const player = playbackId
-    ? `<div class="kh-player-wrap"><div class="kh-player-sizer"><mux-player playback-id="${esc(playbackId)}" metadata-video-title="${esc(v.title)} — behind the scenes" playsinline></mux-player></div></div>`
+    ? `<div class="kh-player-wrap"><div class="kh-player-sizer"><mux-player playback-id="${esc(playbackId)}"${btsPoster(v)} metadata-video-title="${esc(v.title)} — behind the scenes" playsinline></mux-player></div></div>`
     : ''
   const grid = photos.length
     ? `<div class="kh-project-stills">${photos.map((f, i) =>
