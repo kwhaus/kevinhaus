@@ -244,7 +244,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     { key: 'featuredStills', label: 'Home-page stills — one per line (blank = use all stills)', list: true },
     { key: 'festivals',    label: 'Festivals / premieres — one per line', list: true },
     { key: 'awards',       label: 'Awards — one per line',       list: true },
-    { key: 'note',         label: 'Press quote / note',          area: true },
+    { key: 'story',        label: 'Story — a line or short paragraph shown under the title (blank line = new paragraph)', area: true },
+    { key: 'press',        label: 'Press — one per line:  Quote | Source | URL', press: true },
+    { key: 'note',         label: 'Note (small italic line, e.g. a festival blurb)', area: true },
     { key: 'btsPlaybackId', label: 'Behind-the-scenes video — Mux playback ID', half: true },
     { key: 'btsCoverImage', label: 'BTS video cover image filename (assets/Covers/)', half: true },
     { key: 'btsThumbnailTime', label: 'BTS video thumbnail frame, seconds (if no cover image)', half: true, number: true },
@@ -279,11 +281,13 @@ document.addEventListener('DOMContentLoaded', async () => {
           input.appendChild(opt)
         })
         input.value = video[f.key] || f.select[0]
-      } else if (f.list || f.area) {
+      } else if (f.list || f.area || f.press) {
         input = document.createElement('textarea')
         input.className = 'form-control form-control-sm'
-        input.rows = f.list ? Math.min(8, Math.max(3, (video[f.key] || []).length + 1)) : 2
-        input.value = f.list ? (Array.isArray(video[f.key]) ? video[f.key].join('\n') : '') : (video[f.key] || '')
+        input.rows = (f.list || f.press) ? Math.min(8, Math.max(3, (video[f.key] || []).length + 1)) : 3
+        input.value = f.press
+          ? (Array.isArray(video[f.key]) ? video[f.key].map(p => [p.quote, p.source, p.url].filter(x => x != null).join(' | ')).join('\n') : '')
+          : f.list ? (Array.isArray(video[f.key]) ? video[f.key].join('\n') : '') : (video[f.key] || '')
       } else {
         input = document.createElement('input')
         input.type = 'text'
@@ -314,7 +318,18 @@ document.addEventListener('DOMContentLoaded', async () => {
       const next = { ...video }
       for (const f of FIELDS) {
         const raw = panel.querySelector(`[data-field="${f.key}"]`).value
-        if (f.list) {
+        if (f.press) {
+          const items = raw.split('\n').map(line => {
+            const [quote = '', source = '', url = ''] = line.split('|').map(x => x.trim())
+            return { quote, source, url }
+          }).filter(p => p.quote).map(p => {
+            const out = { quote: p.quote }
+            if (p.source) out.source = p.source
+            if (p.url) out.url = p.url
+            return out
+          })
+          if (items.length) next[f.key] = items; else delete next[f.key]
+        } else if (f.list) {
           const items = raw.split(/[\n,]+/).map(x => x.trim()).filter(Boolean)
           if (items.length) next[f.key] = items; else delete next[f.key]
         } else {

@@ -26,9 +26,13 @@
       "purplestrings13.webp",
       "purplestrings14.webp"
     ],
-    "featuredStills": ["purplestrings01.webp"],
+    "featuredStills": [
+      "purplestrings01.webp"
+    ],
     "heroStill": true,
-    "showInPortfolio": true
+    "showInPortfolio": true,
+    "btsPlaybackId": "8w502PwkJ02G533z4KJyQ5gC69He9Wfuoj1TCkw9jS7yc",
+    "btsThumbnailTime": 44
   },
   {
     "id": 2,
@@ -51,7 +55,9 @@
       "eatenbyworms07.webp",
       "eatenbyworms08.webp"
     ],
-    "featuredStills": ["eatenbyworms04.webp"],
+    "featuredStills": [
+      "eatenbyworms04.webp"
+    ],
     "showInPortfolio": true
   },
   {
@@ -75,7 +81,9 @@
       "zeroday07.webp",
       "zeroday08.webp"
     ],
-    "featuredStills": ["zeroday06.webp"],
+    "featuredStills": [
+      "zeroday06.webp"
+    ],
     "showInPortfolio": true
   },
   {
@@ -116,10 +124,16 @@
       "slowyou05.webp",
       "slowyou06.webp"
     ],
-    "featuredStills": ["slowyou04.webp"],
+    "featuredStills": [
+      "slowyou04.webp"
+    ],
     "showInPortfolio": true,
-    "festivals": ["Hollywood Music Video Awards"],
-    "awards": ["Nominated, Best Low Budget and Best Indie"]
+    "festivals": [
+      "Hollywood Music Video Awards"
+    ],
+    "awards": [
+      "Nominated, Best Low Budget and Best Indie"
+    ]
   },
   {
     "id": 6,
@@ -179,7 +193,9 @@
       "pessimism03.webp",
       "pessimism04.webp"
     ],
-    "featuredStills": ["pessimism01.webp"],
+    "featuredStills": [
+      "pessimism01.webp"
+    ],
     "showInPortfolio": true
   },
   {
@@ -238,17 +254,22 @@
       "theWreck05.webp",
       "theWreck06.webp"
     ],
-    "featuredStills": ["theWreck06.webp"],
-    "showInPortfolio": true,
-    "festivals": ["Cannes Court Métrage Cannes, France", 
-    "NY Int’l Short Film Festival - World Premiere, New York, NY", 
-    "Manhattan Film Festival, New York, NY", 
-    "Hawaii Int’l Short Film Festival, Hawaii",
-    "NewFilmmakers NY, New York, NY", 
-    "Int’l Psychoanalysis and Film Festival, Bucharest, Romania", 
-    "Richmond Int’l Film Festival, Richmond, VA"
+    "featuredStills": [
+      "theWreck06.webp"
     ],
-    "awards": ["Winner Best Art Short - Manhattan Film Festival"],
+    "showInPortfolio": true,
+    "festivals": [
+      "Cannes Court Métrage Cannes, France",
+      "NY Int’l Short Film Festival - World Premiere, New York, NY",
+      "Manhattan Film Festival, New York, NY",
+      "Hawaii Int’l Short Film Festival, Hawaii",
+      "NewFilmmakers NY, New York, NY",
+      "Int’l Psychoanalysis and Film Festival, Bucharest, Romania",
+      "Richmond Int’l Film Festival, Richmond, VA"
+    ],
+    "awards": [
+      "Winner Best Art Short - Manhattan Film Festival"
+    ],
     "note": "Short of the Week: 'A unique and poetic cinematic voice.'"
   },
   {
@@ -268,8 +289,12 @@
     ],
     "featuredStills": [],
     "showInPortfolio": true,
-    "festivals": ["Ex Awards"],
-    "awards":  ["Winner Best PR Stunt, Las Vegas, NV"]
+    "festivals": [
+      "Ex Awards"
+    ],
+    "awards": [
+      "Winner Best PR Stunt, Las Vegas, NV"
+    ]
   },
   {
     "id": 13,
@@ -415,8 +440,4 @@
     "featuredStills": [],
     "showInPortfolio": false
   }
-
-
-
-
-]  
+]

@@ -35,6 +35,7 @@ export default defineConfig({
           // Project-page markup is generated in build/prerender.js, which
           // PurgeCSS doesn't scan.
           /^kh-project/,
+          /^kh-index/,
         ],
         deep: [
           /dragging/,

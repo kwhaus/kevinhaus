@@ -14,10 +14,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png">
   <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
-  <!-- Preload first video cover so it appears before JS runs -->
-  <link rel="preload" as="image" href="/assets/Covers/cover_PurpleStrings.webp" fetchpriority="high">
-  <!-- VideoObject structured data injected by work.js -->
-  <script src="https://cdn.jsdelivr.net/npm/@mux/mux-player@3.11.7" defer></script>
+  <!-- ItemList structured data is added at build time by build/prerender.js -->
   <script type="module" src="./js/main.js"></script>
   <script type="module" src="./js/work.js"></script>
 </head>
@@ -41,24 +38,14 @@
   <div id="kh-nav-mount"></div>
 
   <main class="kh-page">
-    <div class="kh-work">
+    <div class="kh-work kh-work-index">
 
-      <!-- Video player -->
-      <div class="kh-player-wrap" id="playerWrap">
-        <div class="kh-player-sizer" id="playerSizer">
-          <mux-player
-            id="mainPlayer"
-            playback-id=""
-            metadata-video-title=""
-            playsinline
-          ></mux-player>
-        </div>
-      </div>
+      <h1 class="visually-hidden">Work by Kevin Haus</h1>
 
-      <!-- Numbered playlist -->
-      <ol class="kh-playlist" id="playlist">
-        <!-- Items injected by work.js -->
-      </ol>
+      <!-- Grouped thumbnail index — generated at build time by
+           build/prerender.js (workIndexHtml). Order and visibility come from
+           the admin. -->
+      <!--KH:WORK-INDEX-->
 
     </div>
 

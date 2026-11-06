@@ -94,6 +94,27 @@ async function fetchRemoteCatalog(warn) {
   return null
 }
 
+// Local dev only: use the list currently saved on the live site, so `npm run dev`
+// shows the same projects, BTS videos, etc. as production. Falls back to
+// src/videos.json if offline. Set KH_VIDEOS_SOURCE=file to skip.
+async function fetchLiveVideos(warn) {
+  if (process.env.KH_VIDEOS_SOURCE === 'file') return null
+  const base = (process.env.KH_LIVE_URL || SITE).replace(/\/$/, '')
+  try {
+    const res = await fetch(`${base}/.netlify/functions/get-videos`, {
+      headers: { 'Cache-Control': 'no-cache' },
+      signal: AbortSignal.timeout(8000),
+    })
+    if (!res.ok) throw new Error(`HTTP ${res.status}`)
+    const list = await res.json()
+    if (Array.isArray(list) && list.length) return list
+    warn('no saved list on the live site yet — using src/videos.json.')
+  } catch (err) {
+    warn(`could not reach the live site (${err.message}) — using src/videos.json.`)
+  }
+  return null
+}
+
 function readVideos() {
   const all = remoteCatalog
     || JSON.parse(readFileSync(resolve(root, 'src/videos.json'), 'utf-8'))
@@ -181,20 +202,45 @@ function pickHero(videos, pool) {
   return pool[0]
 }
 
-// ── PLAYLIST MARKUP ───────────────────────────────────────────────────────────
-// NOTE: no whitespace or line breaks between the spans below. Collapsed
-// whitespace becomes real text nodes, and any underline styling on the link
-// renders those as stray dashes between the title and the type. Use CSS gap
-// for spacing instead of literal spaces in the markup.
-function playlistHtml(videos) {
-  return videos.map((v, i) => {
-    const label = (v.type || '').toLowerCase()
-    const type = label
-      ? `<span class="kh-playlist-type">(${esc(label)})</span>`
-      : ''
-    return `
-        <li class="kh-playlist-item"><a class="kh-playlist-link" href="${esc(v.url)}" data-id="${esc(v.id)}"><span class="kh-playlist-num">${toRoman(i + 1)}.</span><span class="kh-playlist-title">${esc(v.title)}</span>${type}</a></li>`
-  }).join('')
+// ── WORK INDEX ────────────────────────────────────────────────────────────────
+// /work.html: one thumbnail grid in admin order, with a filter bar on top.
+// Every project is in the HTML (crawlable); src/js/work.js just hides and shows
+// them. Filters are linkable: /work.html#narrative. A filter only appears if at
+// least one project matches it. Projects whose type matches no filter still
+// show under "All".
+const WORK_FILTERS = [
+  { key: 'narrative',    label: 'Narrative',  types: ['short film'] },
+  { key: 'music-video',  label: 'Music Video', types: ['music video'] },
+  { key: 'commercial',   label: 'Commercial', types: ['commercial', 'branded content'] },
+]
+
+const filterKeyFor = v =>
+  (WORK_FILTERS.find(f => f.types.includes((v.type || '').toLowerCase())) || {}).key || ''
+
+function thumbUrl(v) {
+  return v.coverImage
+    ? `${ASSETS_BASE}/Covers/${v.coverImage}`
+    : `https://image.mux.com/${v.playbackId}/thumbnail.webp?time=${v.thumbnailTime ?? 3}&width=640`
+}
+
+function indexItem(v, eager) {
+  const type = (v.type || '').toLowerCase()
+  const y = v.date ? String(v.date).slice(0, 4) : ''
+  const meta = [type, y].filter(Boolean).map(esc).join(' · ')
+  return `<li class="kh-index-item" data-cat="${esc(filterKeyFor(v))}"><a class="kh-index-link" href="${esc(v.url)}"><span class="kh-index-thumb"><img src="${esc(thumbUrl(v))}" alt="${esc(v.title)} — ${esc(type || 'film')} directed by Kevin Haus" width="640" height="360" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async"></span><span class="kh-index-title">${esc(v.title)}</span><span class="kh-index-meta">${meta}</span></a></li>`
+}
+
+function workIndexHtml(videos) {
+  const present = WORK_FILTERS.filter(f => videos.some(v => filterKeyFor(v) === f.key))
+  // Hidden until work.js runs, so there are never dead buttons without JS.
+  const bar = present.length > 1
+    ? `<div class="kh-index-filters" role="group" aria-label="Filter work" hidden>` +
+      `<button type="button" class="kh-index-filter" data-filter="all" aria-pressed="true">All</button>` +
+      present.map(f => `<button type="button" class="kh-index-filter" data-filter="${esc(f.key)}" aria-pressed="false">${esc(f.label)}</button>`).join('') +
+      `</div>`
+    : ''
+  const items = videos.map((v, i) => indexItem(v, i < 2)).join('')
+  return `${bar}<ol class="kh-index-list">${items}</ol>`
 }
 
 // ── STRUCTURED DATA ───────────────────────────────────────────────────────────
@@ -226,6 +272,11 @@ function absolute(url) {
 }
 
 function projectDescription(v) {
+  if (v.story) {
+    const first = String(v.story).replace(/\s+/g, ' ').trim()
+    const text = `${v.title}: ${first}`
+    return text.length <= 160 ? text : text.slice(0, 157).replace(/\s+\S*$/, '') + '…'
+  }
   const type = (v.type || 'film').toLowerCase()
   const article = /^[aeiou]/.test(type) ? 'an' : 'a'
   let d = `${v.title}, ${article} ${type} directed by Kevin Haus`
@@ -327,6 +378,26 @@ function btsHtml(v) {
   return `<section class="kh-project-bts" aria-label="Behind the scenes"><h2 class="kh-project-subhead">Behind the scenes</h2>${player}${grid}</section>`
 }
 
+// Story: a line or short paragraph per project (blank line = new paragraph).
+function storyHtml(v) {
+  if (!v.story) return ''
+  const paras = String(v.story).split(/\n{2,}/).map(t => t.trim()).filter(Boolean)
+  return `<div class="kh-project-story">${paras.map(t => `<p>${esc(t)}</p>`).join('')}</div>`
+}
+
+// Press: [{ quote, source, url }]. Only http(s) links are rendered as links.
+function pressHtml(v) {
+  const items = (Array.isArray(v.press) ? v.press : []).filter(p => p && p.quote)
+  if (!items.length) return ''
+  return `<section class="kh-project-press" aria-label="Press">${items.map(p => {
+    const link = p.url && /^https?:\/\//.test(p.url)
+    const src = p.source
+      ? `<footer>— ${link ? `<a href="${esc(p.url)}" target="_blank" rel="noopener">${esc(p.source)}</a>` : esc(p.source)}</footer>`
+      : ''
+    return `<blockquote class="kh-project-quote"><p>“${esc(p.quote)}”</p>${src}</blockquote>`
+  }).join('')}</section>`
+}
+
 // PLACEHOLDER LAYOUT — structure only. Every field comes from videos.json and
 // each block is skipped when its data is missing. Restyle freely in
 // styles.scss (look for "PROJECT PAGE").
@@ -372,7 +443,9 @@ function projectBody(v, prev, next, warn) {
         <p class="kh-project-meta">${meta}</p>
       </header>
 
+      ${storyHtml(v)}
       ${rows.length ? `<dl class="kh-project-credits">${rows.join('')}</dl>` : ''}
+      ${pressHtml(v)}
       ${v.note ? `<p class="kh-project-note">${esc(v.note)}</p>` : ''}
       ${gallery}
       ${btsHtml(v)}
@@ -473,7 +546,11 @@ export default function prerender() {
     },
 
     async buildStart() {
-      if (!isBuild) return
+      if (!isBuild) {
+        remoteCatalog = await fetchLiveVideos(warn)
+        console.log(`[kh-prerender] dev video list: ${remoteCatalog ? `live site (${remoteCatalog.length} entries)` : 'src/videos.json'}`)
+        return
+      }
       remoteCatalog = await fetchRemoteCatalog(warn)
       console.log(`[kh-prerender] video list source: ${remoteCatalog ? `Netlify Blobs (${remoteCatalog.length} entries)` : 'src/videos.json'}`)
     },
@@ -501,15 +578,6 @@ export default function prerender() {
         )
 
         const videos = readVideos()
-
-        // The menu's "Work" link opens the first project; the full list is
-        // still at /work.html ("All work" link on each project page).
-        if (videos[0]) {
-          html = html.replace(
-            /<a href="\/work\.html" class="kh-nav-link">/,
-            `<a href="${videos[0].url}" class="kh-nav-link" data-section="work">`
-          )
-        }
 
         // ── HOME ────────────────────────────────────────────────────────────
         if (file.endsWith('index.html')) {
@@ -542,24 +610,11 @@ export default function prerender() {
         // ── WORK ────────────────────────────────────────────────────────────
         if (!file.endsWith('work.html')) return html
 
-        html = html.replace(
-          /(<ol class="kh-playlist" id="playlist">)[\s\S]*?(<\/ol>)/,
-          `$1${playlistHtml(videos)}\n      $2`
-        )
+        html = html.replace('<!--KH:WORK-INDEX-->', () => workIndexHtml(videos))
 
         const payload =
-          `\n  <script type="application/json" id="kh-videos">${jsonForScript(videos)}</script>` +
           `\n  <script type="application/ld+json">${jsonForScript(itemListSchema(videos))}</script>\n`
-
         html = html.replace('</head>', `${payload}</head>`)
-
-        const first = videos[0]
-        if (first) {
-          html = html.replace(
-            /<link rel="preload" as="image" href="[^"]*" fetchpriority="high">/,
-            `<link rel="preload" as="image" href="${posterUrl(first)}" fetchpriority="high">`
-          )
-        }
 
         return html
       },
