@@ -32,7 +32,9 @@ async function mux(path, init = {}) {
   const id = process.env.MUX_TOKEN_ID
   const secret = process.env.MUX_TOKEN_SECRET
   if (!id || !secret) {
-    const err = new Error('MUX_TOKEN_ID / MUX_TOKEN_SECRET are not set in Netlify.')
+    const missing = [!id && 'MUX_TOKEN_ID', !secret && 'MUX_TOKEN_SECRET'].filter(Boolean).join(' and ')
+    const context = process.env.CONTEXT || 'unknown'
+    const err = new Error(`${missing} ${missing.includes(' and ') ? 'are' : 'is'} empty in this deploy (context: ${context}). In Netlify, check the value for that context, then redeploy.`)
     err.status = 500
     throw err
   }
