@@ -66,6 +66,15 @@
 
           <div id="adminList"></div>
 
+          <!-- Compare with the Mux library (filled by admin.js) -->
+          <div style="margin-top: 2rem; border-top: 1px solid var(--kh-border); padding-top: 1.5rem;">
+            <div style="display:flex; align-items:center; gap:1rem; margin-bottom:1rem;">
+              <h2 style="font-size:0.8rem; letter-spacing:0.15em; text-transform:uppercase; margin:0; color:var(--kh-text-muted);">From your Mux library</h2>
+              <button id="muxRefresh" type="button" class="btn btn-sm btn-link p-0 ms-auto" style="font-family:inherit; font-size:0.75rem; color:var(--kh-text-muted); text-decoration:none;">Check again</button>
+            </div>
+            <div id="muxCompare" style="font-size:0.85rem; color:var(--kh-text-muted);">Checking Mux…</div>
+          </div>
+
           <!-- Add video form -->
           <div style="margin-top: 2rem; border-top: 1px solid var(--kh-border); padding-top: 1.5rem;">
             <h2 style="font-size:0.8rem; letter-spacing:0.15em; text-transform:uppercase; margin-bottom:1.25rem; color:var(--kh-text-muted);">Add New Video</h2>
