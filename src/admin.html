@@ -13,8 +13,11 @@
     function switchTab(tab) {
       document.getElementById('panelVideos').style.display = tab === 'videos' ? '' : 'none'
       document.getElementById('panelReels').style.display  = tab === 'reels'  ? '' : 'none'
+      document.getElementById('panelDeliver').style.display = tab === 'deliver' ? '' : 'none'
       document.getElementById('tabVideos').classList.toggle('kh-admin-tab--active', tab === 'videos')
       document.getElementById('tabReels').classList.toggle('kh-admin-tab--active',  tab === 'reels')
+      document.getElementById('tabDeliver').classList.toggle('kh-admin-tab--active', tab === 'deliver')
+      if (tab === 'deliver') window.dispatchEvent(new Event('kh-deliver-open'))
     }
   </script>
 </head>
@@ -51,6 +54,7 @@
         <div style="display:flex; gap:0; border-bottom: 1px solid var(--kh-border); margin-bottom: 1.5rem;">
           <button id="tabVideos" class="kh-admin-tab kh-admin-tab--active" onclick="switchTab('videos')">Videos</button>
           <button id="tabReels"  class="kh-admin-tab" onclick="switchTab('reels')">Reels</button>
+          <button id="tabDeliver" class="kh-admin-tab" onclick="switchTab('deliver')">Deliver</button>
         </div>
 
         <!-- ── VIDEOS TAB ──────────────────────────────────────── -->
@@ -196,6 +200,9 @@
           </div>
 
         </div>
+
+        <!-- ── DELIVER TAB (built by js/deliver.js) ─────────────── -->
+        <div id="panelDeliver" style="display:none;"></div>
 
       </div>
     </div>

@@ -1,5 +1,6 @@
 import videosData from '../videos.json'
 import navHtml from '../pages/nav.html?raw'
+import { initDeliver } from './deliver.js'
 
 document.addEventListener('DOMContentLoaded', async () => {
 
@@ -75,6 +76,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     loginDiv.style.display = 'none'
     panelDiv.style.display = 'block'
     loadVideos()
+    initDeliver(() => adminPassword)
   }
 
   // ── LOGIN ────────────────────────────────────────────────────────────────────
@@ -87,6 +89,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       loginDiv.style.display = 'none'
       panelDiv.style.display = 'block'
       loadVideos()
+      initDeliver(() => adminPassword)
     } else {
       loginErr.style.display = 'block'
       pwInput.value = ''
