@@ -71,6 +71,7 @@ function trim(a) {
     frameRate: video.max_frame_rate || null,
     aspectRatio: a.aspect_ratio || '',
     publicPlaybackId: (a.playback_ids || []).find(p => p.policy === 'public')?.id || null,
+    playbackIds: (a.playback_ids || []).map(p => p.id),
     hasSignedOnly: (a.playback_ids || []).length > 0 && !(a.playback_ids || []).some(p => p.policy === 'public'),
     mp4: files
       .filter(f => f.ext === 'mp4')

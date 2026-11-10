@@ -1,6 +1,7 @@
 import videosData from '../videos.json'
 import navHtml from '../pages/nav.html?raw'
 import { initDeliver } from './deliver.js'
+import { loadMuxLibrary, compareWithList, entryFromAsset, reelVideoFromAsset, ratioFor } from './mux-library.js'
 
 document.addEventListener('DOMContentLoaded', async () => {
 
@@ -119,6 +120,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     buildList()
     buildReelPicker()
     loadReels()
+    loadMux()
   }
 
   // ── SAVE VIDEOS TO BLOBS ─────────────────────────────────────────────────────
@@ -224,6 +226,88 @@ document.addEventListener('DOMContentLoaded', async () => {
     })
 
     initDragDrop()
+    renderMuxCompare()
+  }
+
+  // ── MUX LIBRARY ──────────────────────────────────────────────────────────────
+  // Compares the Mux library with the list above. "Add" puts a video on the
+  // list with Portfolio switched OFF, so nothing changes on the public site
+  // until you switch it on and press Save to Live Site.
+  const muxCompareEl = document.getElementById('muxCompare')
+  let muxAssets = null
+  let muxError = ''
+
+  async function loadMux(refresh = false) {
+    if (muxCompareEl) muxCompareEl.textContent = 'Checking Mux…'
+    try {
+      muxAssets = await loadMuxLibrary(adminPassword, { refresh })
+      muxError = ''
+    } catch (err) {
+      muxAssets = null
+      muxError = err.message
+    }
+    renderMuxCompare()
+    buildReelPicker()
+  }
+  document.getElementById('muxRefresh')?.addEventListener('click', () => loadMux(true))
+
+  function muxMeta(a) {
+    return [ratioFor(a), a.width && a.height ? `${a.width}×${a.height}` : '',
+      a.duration ? `${Math.floor(a.duration / 60)}:${String(Math.round(a.duration % 60)).padStart(2, '0')}` : '',
+      a.createdAt ? new Date(a.createdAt).toLocaleDateString() : ''].filter(Boolean).join(' · ')
+  }
+
+  function addFromMux(asset) {
+    const maxId = videoList.reduce((max, v) => Math.max(max, Number(v.id) || 0), 0)
+    videoList.push(entryFromAsset(asset, maxId + 1))
+    markDirty()
+    buildList()
+    buildReelPicker()
+  }
+
+  function renderMuxCompare() {
+    if (!muxCompareEl) return
+    if (muxError) {
+      muxCompareEl.innerHTML = `<span style="color:var(--kh-accent);">${esc(muxError)}</span>`
+      return
+    }
+    if (!muxAssets) return
+    const { missing, notInMux, signedOnly } = compareWithList(muxAssets, videoList)
+
+    const summary = `${muxAssets.length} videos in Mux · ${missing.length} not on your list` +
+      (signedOnly ? ` · ${signedOnly} signed-only skipped` : '')
+
+    const rows = missing.map(a => `
+      <div style="display:flex; align-items:center; gap:0.75rem; padding:0.5rem 0; border-bottom:1px solid var(--kh-border);">
+        <div style="flex:1; min-width:0;">
+          <div style="color:var(--kh-text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${esc(a.title || '(untitled)')}</div>
+          <div style="font-size:0.75rem;">${esc(muxMeta(a))}</div>
+        </div>
+        <button type="button" class="btn btn-sm btn-outline-secondary mux-add" data-asset="${esc(a.id)}"
+          style="font-family:inherit; font-size:0.75rem; padding:0.1rem 0.6rem; flex-shrink:0;">+ Add (hidden)</button>
+      </div>`).join('')
+
+    const orphans = notInMux.length ? `
+      <div style="margin-top:1rem;">
+        <div style="margin-bottom:0.25rem;">On your list but not found in this Mux environment (check before deleting anything in Mux):</div>
+        ${notInMux.map(v => `<div style="padding:0.2rem 0; color:var(--kh-text);">· ${esc(v.title)}</div>`).join('')}
+      </div>` : ''
+
+    muxCompareEl.innerHTML = `
+      <div style="margin-bottom:0.5rem;">${esc(summary)}</div>
+      ${missing.length ? `<div style="margin-bottom:0.5rem;">Added videos start with <strong>Portfolio off</strong>, so the public site doesn't change until you switch them on and save.</div>` : '<div>Everything in Mux is already on your list.</div>'}
+      <div style="max-height:320px; overflow-y:auto;">${rows}</div>
+      ${missing.length > 1 ? `<button type="button" id="muxAddAll" class="btn btn-sm btn-link p-0 mt-2" style="font-family:inherit; font-size:0.75rem; color:var(--kh-text-muted);">Add all ${missing.length} (hidden)</button>` : ''}
+      ${orphans}`
+
+    muxCompareEl.querySelectorAll('.mux-add').forEach(btn => btn.addEventListener('click', () => {
+      const asset = muxAssets.find(a => a.id === btn.dataset.asset)
+      if (asset) addFromMux(asset)
+    }))
+    muxCompareEl.querySelector('#muxAddAll')?.addEventListener('click', () => {
+      if (!confirm(`Add ${missing.length} videos to the list with Portfolio off?`)) return
+      missing.forEach(addFromMux)
+    })
   }
 
   // ── EDIT PANEL ───────────────────────────────────────────────────────────────
@@ -559,6 +643,29 @@ document.addEventListener('DOMContentLoaded', async () => {
       item.addEventListener('click', () => addToReel(video))
       reelAvailable.appendChild(item)
     })
+
+    // Videos in Mux that aren't on the site's list — added to the reel only.
+    if (muxAssets) {
+      const { missing } = compareWithList(muxAssets, videoList)
+      if (missing.length) {
+        const head = document.createElement('div')
+        head.style.cssText = 'font-size:0.65rem; color:var(--kh-text-muted); letter-spacing:0.08em; text-transform:uppercase; padding:0.75rem 0.25rem 0.25rem; border-top:1px solid var(--kh-border); margin-top:0.25rem;'
+        head.textContent = 'Mux library — reel only, not added to your list'
+        reelAvailable.appendChild(head)
+        missing.forEach(asset => {
+          const video = reelVideoFromAsset(asset)
+          const item = document.createElement('div')
+          item.className = 'kh-reel-pick-item'
+          item.innerHTML = `
+            <span class="pick-title">${esc(video.title)}</span>
+            <span class="pick-type">mux · ${esc(video.aspectRatio)}</span>
+            <span class="pick-action">+</span>
+          `
+          item.addEventListener('click', () => addToReel(video))
+          reelAvailable.appendChild(item)
+        })
+      }
+    }
   }
 
   // Add video to reel contents
