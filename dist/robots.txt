@@ -1,6 +1,0 @@
-User-agent: *
-Allow: /
-Disallow: /admin.html
-Disallow: /reel.html
-
-Sitemap: https://kevinhaus.com/sitemap.xml
